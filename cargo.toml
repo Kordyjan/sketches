@@ -1,6 +1,6 @@
 [workspace]
 
-members = ["sparse_vec"]
+members = [ "per_set","sparse_vec", "test_utils"]
 resolver = "2"
 
 [workspace.lints.clippy]

@@ -1,14 +1,10 @@
 [package]
-name = "sparse_vec"
+name = "test_utils"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-
-[dev-dependencies]
 proptest = "1"
-test_utils = { path = "../test_utils" }
-
 
 [lints]
 workspace = true

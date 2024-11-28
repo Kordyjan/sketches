@@ -1,9 +1,9 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
 use super::SparseVec;
-use proptest::collection::hash_map;
-use proptest::prelude::*;
-use proptest::sample::select;
+use proptest::{collection::hash_map, prelude::*};
+
+use test_utils::map_with_selected;
 
 proptest! {
     #[test]
@@ -28,7 +28,7 @@ proptest! {
     }
 
     #[test]
-    fn elements_can_be_overwritten((elems, selected) in map_with_selected(5)) {
+    fn elements_can_be_overwritten((elems, selected) in map_with_selected(5, 0usize..16)) {
         let mut sparse_vec = SparseVec::<16, String>::new();
         for (pos, elem) in elems.iter() {
             sparse_vec.insert(*pos, elem.clone());
@@ -42,7 +42,7 @@ proptest! {
     }
 
     #[test]
-    fn elemenets_can_be_swapped((elems, selected) in map_with_selected(5)) {
+    fn elemenets_can_be_swapped((elems, selected) in map_with_selected(5, 0usize..16)) {
         let mut sparse_vec = SparseVec::<16, String>::new();
         for (pos, elem) in elems.iter() {
             sparse_vec.insert(*pos, elem.clone());
@@ -56,7 +56,7 @@ proptest! {
     }
 
     #[test]
-    fn elements_can_be_removed((elems, selected) in map_with_selected(5)) {
+    fn elements_can_be_removed((elems, selected) in map_with_selected(5, 0usize..16)) {
         let mut sparse_vec = SparseVec::<16, String>::new();
         for (pos, elem) in elems.iter() {
             sparse_vec.insert(*pos, elem.clone());
@@ -82,13 +82,4 @@ proptest! {
             ()
         }
     }
-}
-
-prop_compose! {
-    fn map_with_selected(elem_num: usize)
-        (elems in hash_map(0usize..16, ".*", 1..elem_num))
-            (selected in select(elems.keys().map(|u| *u).collect::<Vec<usize>>()), elems in Just(elems))
-            -> (HashMap<usize, String>, usize)  {
-                (elems, selected)
-        }
 }
