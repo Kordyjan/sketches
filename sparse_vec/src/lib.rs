@@ -1,11 +1,13 @@
 use std::mem;
 
+use smallvec::SmallVec;
+
 #[cfg(test)]
 mod tests;
 
 pub struct SparseVec<const CAP: usize, T> {
     mask: usize,
-    data: Vec<T>,
+    data: SmallVec<[T; 4]>,
 }
 
 impl<const CAP: usize, T> Default for SparseVec<CAP, T> {
@@ -19,7 +21,7 @@ impl<const CAP: usize, T> SparseVec<CAP, T> {
     pub fn new() -> Self {
         Self {
             mask: 0,
-            data: Vec::with_capacity(2),
+            data: SmallVec::new(),
         }
     }
     #[must_use]
