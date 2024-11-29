@@ -76,3 +76,12 @@ impl<const CAP: usize, T> SparseVec<CAP, T> {
         (self.mask >> (CAP - pos)).count_ones() as usize
     }
 }
+
+impl<const CAP: usize, T: Clone> Clone for SparseVec<CAP, T> {
+    fn clone(&self) -> Self {
+        Self {
+            mask: self.mask,
+            data: self.data.clone(),
+        }
+    }
+}

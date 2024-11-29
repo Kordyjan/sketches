@@ -91,6 +91,7 @@ proptest! {
 
 }
 
+#[derive(Clone)]
 struct DegenerateBuildHasher;
 
 struct DegenerateHasher;
