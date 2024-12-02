@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 sparse_vec = { path = "../sparse_vec" }
 smallvec = { version = "1", features = ["union", "const_generics"] }
+rustc-hash = "2"
 
 [dev-dependencies]
 proptest = "1"

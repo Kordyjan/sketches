@@ -7,9 +7,18 @@ use super::PerMap;
 use proptest::{collection::hash_map, prelude::*};
 use test_utils::map_with_selected;
 
+fn configure() -> ProptestConfig {
+    let mut conf = ProptestConfig::with_cases(2u32.pow(10));
+    conf.max_shrink_iters = 2u32.pow(14);
+    conf
+}
+
 proptest! {
+
+    #![proptest_config(configure())]
+
     #[test]
-    fn len_is_correct(elems in hash_map(0u64..1024, ".*", 0usize..16)) {
+    fn len_is_correct(elems in hash_map(0u64..1024, "\\w{1,7}", 0usize..16)) {
         let map = PerMap::<u64, String>::empty();
         let len = elems.len();
 
@@ -19,7 +28,8 @@ proptest! {
     }
 
     #[test]
-    fn values_are_retrieved(elems in hash_map(0u64..1024, ".*", 0usize..16)) {
+    fn values_are_retrieved(elems in hash_map(0u64..1024, "\\w{1,7}", 0usize..16)) {
+        println!("\n\n\n\n");
         let map = PerMap::<u64, String>::empty();
         let map = elems.iter().fold(map, |m, (k, v)| m.insert(*k, v.clone()));
 
@@ -43,7 +53,7 @@ proptest! {
     }
 
     #[test]
-    fn map_can_handle_hash_clashes(elems in hash_map(0u64..1024, ".*", 0usize..16)) {
+    fn map_can_handle_hash_clashes(elems in hash_map(0u64..1024, "\\w{1,7}", 0usize..16)) {
         let map = PerMap::<u64, String, DegenerateBuildHasher>::with_hasher(DegenerateBuildHasher);
 
         let map = elems.iter().fold(map, |m, (k, v)| m.insert(*k, v.clone()));
@@ -58,9 +68,9 @@ proptest! {
 
     #[test]
     fn union_of_maps_preserves_all_keys_and_has_values_from_right_side(
-        left_only in hash_map(0u64..1024, ".*", 0usize..16),
-        right_only in hash_map(1024u64..2048, ".*", 0usize..16),
-        common in hash_map(0u64..1024, ".*", 0usize..16),
+        left_only in hash_map(0u64..1024, "\\w{1,7}", 0usize..16),
+        right_only in hash_map(1024u64..2048, "\\w{1,7}", 0usize..16),
+        common in hash_map(0u64..1024, "\\w{1,7}", 0usize..16),
     ) {
         let left = left_only.iter()
             .chain(common.iter())

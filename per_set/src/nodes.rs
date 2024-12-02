@@ -1,4 +1,9 @@
-use std::sync::Arc;
+use std::{
+    borrow::Borrow,
+    fmt::{self, Debug, Formatter},
+    hash::Hash,
+    sync::{atomic::AtomicUsize, Arc},
+};
 
 use smallvec::{smallvec, SmallVec};
 use sparse_vec::SparseVec;
@@ -34,7 +39,11 @@ impl<K, V> Node<K, V> {
                     index as usize,
                     Arc::new(Node::allocate(key, value, new_address)),
                 );
-                Node::Branch { data, weight: 1 }
+
+                Node::Branch {
+                    data: data.clone(),
+                    weight: 1,
+                }
             }
         }
     }
@@ -60,7 +69,7 @@ impl<K: Eq, V> Node<K, V> {
         value: V,
         address: BitShifter,
     ) -> Arc<Node<K, V>> {
-        match &**node {
+        let res = match &**node {
             Node::Leaf { data, weight } => {
                 match data.into_iter().position(|arc| (**arc).0 == key) {
                     None => {
@@ -95,19 +104,58 @@ impl<K: Eq, V> Node<K, V> {
                     }
                     Some(next) => {
                         let new_node = Node::insert(next, key, value, new_address);
-                        if Arc::ptr_eq(node, &new_node) {
-                            node.clone()
-                        } else {
-                            let mut new_data = data.clone();
-                            new_data.insert(index as usize, new_node);
-                            Arc::new(Node::Branch {
-                                data: new_data,
-                                weight: weight + 1,
-                            })
-                        }
+                        let mut new_data = data.clone();
+                        let add_weight = new_node.weight();
+                        new_data.insert(index as usize, new_node);
+                        Arc::new(Node::Branch {
+                            data: new_data,
+                            weight: weight + add_weight - next.weight(),
+                        })
                     }
                 }
             }
+        };
+        res
+    }
+
+    pub fn get<Q>(&self, key: &Q, address: BitShifter) -> Option<&V>
+    where
+        K: Borrow<Q>,
+        Q: Eq + Hash,
+    {
+        match self {
+            Node::Leaf { data, .. } => data
+                .iter()
+                .find(|arc| arc.0.borrow() == key)
+                .map(|arc| &arc.1),
+            Node::Branch { data, .. } => {
+                let (new_address, index) = address.shift().unwrap();
+                data.get(index as usize)
+                    .and_then(|node| node.get(key, new_address))
+            }
+        }
+    }
+}
+
+impl<K: Debug, V: Debug> Debug for Node<K, V> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        inner_print(self, f, "")
+    }
+}
+
+fn inner_print<K: Debug, V: Debug>(
+    node: &Node<K, V>,
+    f: &mut Formatter<'_>,
+    prefix: &str,
+) -> fmt::Result {
+    match node {
+        Node::Leaf { data, .. } => writeln!(f, "{}: {:?}", prefix, data),
+        Node::Branch { data, .. } => {
+            for i in data.keys().into_iter() {
+                let new_prefix = format!("{} {:x}", prefix, i);
+                inner_print(data.get(i).unwrap(), f, &new_prefix)?;
+            }
+            Ok(())
         }
     }
 }
@@ -134,6 +182,16 @@ impl BitShifter {
             ))
         } else {
             None
+        }
+    }
+}
+
+impl Debug for BitShifter {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        if self.shift < 64 {
+            write!(f, "{:16x}", self.value)
+        } else {
+            write!(f, "X")
         }
     }
 }

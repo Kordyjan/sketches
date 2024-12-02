@@ -11,7 +11,7 @@ pub fn map_with_selected<K>(
 where
     K: Debug + Hash + Eq + Clone + 'static,
 {
-    let map = hash_map(keys, ".*", 1..elem_num);
+    let map = hash_map(keys, "\\w{1,7}", 1..elem_num);
     map.prop_flat_map(|map| {
         let keys = map.keys().map(|k| k.clone()).collect::<Vec<K>>();
         select(keys).prop_map(move |selected| (map.clone(), selected))

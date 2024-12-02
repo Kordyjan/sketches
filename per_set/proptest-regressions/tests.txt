@@ -4,4 +4,4 @@
 #
 # It is recommended to check this file in to source control so that
 # everyone who runs the test benefits from these saved cases.
-cc b52bd31720e836896174713a2a090e62bcb76edf9fd37181e314b86d674c19d4 # shrinks to elems = {}
+cc 8927568aa18615a5fb49b32c231ae90f98743ac2c981d58aa472e1911d8b6032 # shrinks to elems = {184: "x𐔗ᤋ", 281: "_𑌌ÚvW\u{1bc9e}\u{1112e}", 486: "Ⴭͻ\u{1e01f}r𞹛Ω", 693: "ോE𑍐𐩯_⁀"}

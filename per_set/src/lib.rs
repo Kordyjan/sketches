@@ -1,8 +1,11 @@
 use std::{
     borrow::Borrow,
-    hash::{BuildHasher, Hash, Hasher, RandomState},
+    fmt::Debug,
+    hash::{BuildHasher, Hash, Hasher},
     sync::Arc,
 };
+
+use rustc_hash::FxBuildHasher;
 
 use nodes::{BitShifter, Node};
 
@@ -11,15 +14,15 @@ mod nodes;
 #[cfg(test)]
 mod tests;
 
-#[derive(Clone)]
-pub struct PerMap<K, V, S = RandomState> {
+#[derive(Clone, Debug)]
+pub struct PerMap<K, V, S = FxBuildHasher> {
     data: Arc<Node<K, V>>,
     hasher: S,
 }
 
-impl<K, V> PerMap<K, V, RandomState> {
+impl<K, V> PerMap<K, V, FxBuildHasher> {
     pub fn empty() -> Self {
-        Self::with_hasher(RandomState::new())
+        Self::with_hasher(FxBuildHasher::default())
     }
 }
 
@@ -63,12 +66,18 @@ where
         }
     }
 
-    pub fn get<Q>(&self, key: &K) -> Option<&V>
+    pub fn get<Q>(&self, key: &Q) -> Option<&V>
     where
         K: Borrow<Q>,
         Q: Eq + Hash,
     {
-        todo!()
+        let mut state = self.hasher.build_hasher();
+        key.hash(&mut state);
+        let hash = state.finish();
+
+        let address = BitShifter::new(hash);
+        let res = self.data.get(key, address);
+        res
     }
 
     pub fn union(&self, other: &PerMap<K, V, S>) -> Self {

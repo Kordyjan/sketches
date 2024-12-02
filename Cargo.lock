@@ -119,9 +119,17 @@ name = "per_set"
 version = "0.1.0"
 dependencies = [
  "proptest",
+ "rustc-hash",
  "smallvec",
  "sparse_vec",
  "test_utils",
+]
+
+[[package]]
+name = "playground"
+version = "0.1.0"
+dependencies = [
+ "per_set",
 ]
 
 [[package]]
@@ -221,6 +229,12 @@ name = "regex-syntax"
 version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2b15c43186be67a4fd63bee50d0303afffcef381492ebe2c5d87f324e1b8815c"
+
+[[package]]
+name = "rustc-hash"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "583034fd73374156e66797ed8e5b0d5690409c9226b22d87cb7f19821c05d152"
 
 [[package]]
 name = "rustix"
