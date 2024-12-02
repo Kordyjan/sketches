@@ -13,7 +13,7 @@ where
 {
     let map = hash_map(keys, "\\w{1,7}", 1..elem_num);
     map.prop_flat_map(|map| {
-        let keys = map.keys().map(|k| k.clone()).collect::<Vec<K>>();
+        let keys = map.keys().cloned().collect::<Vec<K>>();
         select(keys).prop_map(move |selected| (map.clone(), selected))
     })
 }

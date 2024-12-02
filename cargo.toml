@@ -1,7 +1,8 @@
 [workspace]
 
-members = [ "per_set", "playground","sparse_vec", "test_utils"]
+members = ["per_set", "playground", "sparse_vec", "test_utils"]
 resolver = "2"
 
 [workspace.lints.clippy]
-pedantic = "warn"
+pedantic = { level = "warn", priority = -1 }
+cast_possible_truncation = "allow"

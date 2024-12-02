@@ -1,7 +1,7 @@
 use std::{
     borrow::Borrow,
     fmt::Debug,
-    hash::{BuildHasher, Hash, Hasher},
+    hash::{BuildHasher, Hash},
     sync::Arc,
 };
 
@@ -21,8 +21,9 @@ pub struct PerMap<K, V, S = FxBuildHasher> {
 }
 
 impl<K, V> PerMap<K, V, FxBuildHasher> {
+    #[must_use]
     pub fn empty() -> Self {
-        Self::with_hasher(FxBuildHasher::default())
+        Self::with_hasher(FxBuildHasher)
     }
 }
 
@@ -54,10 +55,9 @@ where
     K: Eq + Hash,
     S: BuildHasher + Clone,
 {
+    #[must_use]
     pub fn insert(&self, key: K, value: V) -> Self {
-        let mut state = self.hasher.build_hasher();
-        key.hash(&mut state);
-        let hash = state.finish();
+        let hash = self.hasher.hash_one(&key);
         let address = BitShifter::new(hash);
         let new_data = Node::insert(&self.data, key, value, address);
         Self {
@@ -66,21 +66,23 @@ where
         }
     }
 
+    #[must_use]
     pub fn get<Q>(&self, key: &Q) -> Option<&V>
     where
         K: Borrow<Q>,
         Q: Eq + Hash,
     {
-        let mut state = self.hasher.build_hasher();
-        key.hash(&mut state);
-        let hash = state.finish();
-
+        let hash = self.hasher.hash_one(key);
         let address = BitShifter::new(hash);
         let res = self.data.get(key, address);
         res
     }
 
+    #[must_use]
     pub fn union(&self, other: &PerMap<K, V, S>) -> Self {
-        todo!()
+        PerMap {
+            data: Node::merge(&self.data, &other.data),
+            hasher: self.hasher.clone(),
+        }
     }
 }

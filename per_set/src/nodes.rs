@@ -2,7 +2,7 @@ use std::{
     borrow::Borrow,
     fmt::{self, Debug, Formatter},
     hash::Hash,
-    sync::{atomic::AtomicUsize, Arc},
+    sync::Arc,
 };
 
 use smallvec::{smallvec, SmallVec};
@@ -50,8 +50,7 @@ impl<K, V> Node<K, V> {
 
     pub fn weight(&self) -> usize {
         match self {
-            Node::Leaf { weight, .. } => *weight,
-            Node::Branch { weight, .. } => *weight,
+            Node::Branch { weight, .. } | Node::Leaf { weight, .. } => *weight,
         }
     }
 }
@@ -70,26 +69,24 @@ impl<K: Eq, V> Node<K, V> {
         address: BitShifter,
     ) -> Arc<Node<K, V>> {
         let res = match &**node {
-            Node::Leaf { data, weight } => {
-                match data.into_iter().position(|arc| (**arc).0 == key) {
-                    None => {
-                        let mut new_data: SmallVec<_> = data.clone();
-                        new_data.push(Arc::new((key, value)));
-                        Arc::new(Node::Leaf {
-                            data: new_data,
-                            weight: weight + 1,
-                        })
-                    }
-                    Some(pos) => {
-                        let mut new_data: SmallVec<_> = data.clone();
-                        new_data[pos] = Arc::new((key, value));
-                        Arc::new(Node::Leaf {
-                            data: new_data,
-                            weight: *weight,
-                        })
-                    }
+            Node::Leaf { data, weight } => match data.into_iter().position(|arc| arc.0 == key) {
+                None => {
+                    let mut new_data: SmallVec<_> = data.clone();
+                    new_data.push(Arc::new((key, value)));
+                    Arc::new(Node::Leaf {
+                        data: new_data,
+                        weight: weight + 1,
+                    })
                 }
-            }
+                Some(pos) => {
+                    let mut new_data: SmallVec<_> = data.clone();
+                    new_data[pos] = Arc::new((key, value));
+                    Arc::new(Node::Leaf {
+                        data: new_data,
+                        weight: *weight,
+                    })
+                }
+            },
             Node::Branch { data, weight } => {
                 let (new_address, index) = address.shift().unwrap();
                 match data.get(index as usize) {
@@ -116,6 +113,54 @@ impl<K: Eq, V> Node<K, V> {
             }
         };
         res
+    }
+
+    pub fn merge(left: &Arc<Node<K, V>>, right: &Arc<Node<K, V>>) -> Arc<Node<K, V>> {
+        match (&**left, &**right) {
+            (
+                Node::Leaf {
+                    data: left_data, ..
+                },
+                Node::Leaf {
+                    data: right_data, ..
+                },
+            ) => {
+                let mut res = left_data.clone();
+                for r in right_data {
+                    if let Some(p) = res.iter().position(|e| e.0 == r.0) {
+                        res[p] = Arc::clone(r);
+                    } else {
+                        res.push(Arc::clone(r));
+                    }
+                }
+                let weight = res.len();
+                Arc::new(Node::Leaf { data: res, weight })
+            }
+            (
+                Node::Branch {
+                    data: left_data, ..
+                },
+                Node::Branch {
+                    data: right_data, ..
+                },
+            ) => {
+                let mut res = left_data.clone();
+                for k in right_data.keys() {
+                    if let Some(node) = left_data.get(k) {
+                        res.insert(k, Node::merge(node, right_data.get(k).unwrap()));
+                    } else {
+                        res.insert(k, right_data.get(k).unwrap().clone());
+                    }
+                }
+                let weight = res
+                    .keys()
+                    .into_iter()
+                    .map(|k| res.get(k).unwrap().weight())
+                    .sum();
+                Arc::new(Node::Branch { data: res, weight })
+            }
+            _ => unreachable!(),
+        }
     }
 
     pub fn get<Q>(&self, key: &Q, address: BitShifter) -> Option<&V>
@@ -149,10 +194,10 @@ fn inner_print<K: Debug, V: Debug>(
     prefix: &str,
 ) -> fmt::Result {
     match node {
-        Node::Leaf { data, .. } => writeln!(f, "{}: {:?}", prefix, data),
+        Node::Leaf { data, .. } => writeln!(f, "{prefix}: {data:?}"),
         Node::Branch { data, .. } => {
-            for i in data.keys().into_iter() {
-                let new_prefix = format!("{} {:x}", prefix, i);
+            for i in data.keys() {
+                let new_prefix = format!("{prefix} {i:x}");
                 inner_print(data.get(i).unwrap(), f, &new_prefix)?;
             }
             Ok(())
@@ -160,6 +205,7 @@ fn inner_print<K: Debug, V: Debug>(
     }
 }
 
+#[derive(Clone, Copy)]
 pub struct BitShifter {
     value: u64,
     shift: usize,
