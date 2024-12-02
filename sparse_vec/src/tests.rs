@@ -38,7 +38,9 @@ proptest! {
 
         sparse_vec.insert(selected, new_value.clone());
         prop_assert_eq!(Some(&new_value), sparse_vec.get(selected));
-
+        for e in elems.keys().filter(|e| **e != selected) {
+            prop_assert_eq!(elems.get(e), sparse_vec.get(*e));
+        }
     }
 
     #[test]
@@ -52,7 +54,27 @@ proptest! {
 
         let old_value = sparse_vec.swap(selected, new_value.clone());
         prop_assert_eq!(Some(&new_value), sparse_vec.get(selected));
-        prop_assert_eq!(elems.get(&selected).map(String::clone), old_value)
+        prop_assert_eq!(elems.get(&selected).map(String::clone), old_value);
+        for e in elems.keys().filter(|e| **e != selected) {
+            prop_assert_eq!(elems.get(e), sparse_vec.get(*e));
+        }
+    }
+
+    #[test] fn non_existing_elements_can_be_swapped(elems in hash_map(0usize..16, ".*", 0usize..5)) {
+        let mut sparse_vec = SparseVec::<16, String>::new();
+        for (pos, elem) in elems.iter() {
+            sparse_vec.insert(*pos, elem.clone());
+        }
+
+        let new_value = "new value".to_string();
+        let non_present = (0usize..16).find(|i| !elems.contains_key(i)).unwrap();
+        let swapped = sparse_vec.swap(non_present, new_value.clone());
+        prop_assert_eq!(None, swapped);
+        prop_assert_eq!(Some(&new_value), sparse_vec.get(non_present));
+        for e in elems.keys() {
+            prop_assert_eq!(elems.get(e), sparse_vec.get(*e));
+        }
+        prop_assert_eq!(elems.len() + 1, sparse_vec.len());
     }
 
     #[test]

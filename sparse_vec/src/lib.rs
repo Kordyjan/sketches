@@ -5,6 +5,7 @@ use smallvec::SmallVec;
 #[cfg(test)]
 mod tests;
 
+#[derive(Debug)]
 pub struct SparseVec<const CAP: usize, T> {
     mask: usize,
     data: SmallVec<[T; 4]>,
@@ -36,8 +37,13 @@ impl<const CAP: usize, T> SparseVec<CAP, T> {
 
     pub fn insert(&mut self, pos: usize, elem: T) {
         let real_pos = self.elems_before(pos);
-        self.mask |= 1 << (CAP - pos - 1);
-        self.data.insert(real_pos, elem);
+        let already_present = self.mask & (1 << (CAP - pos - 1)) != 0;
+        if already_present {
+            self.data[real_pos] = elem;
+        } else {
+            self.mask |= 1 << (CAP - pos - 1);
+            self.data.insert(real_pos, elem);
+        }
     }
 
     #[must_use]
@@ -68,8 +74,15 @@ impl<const CAP: usize, T> SparseVec<CAP, T> {
             mem::swap(&mut self.data[real_pos], &mut res);
             Some(res)
         } else {
+            self.insert(pos, elem);
             None
         }
+    }
+
+    pub fn keys(&self) -> Vec<usize> {
+        (0..CAP)
+            .filter(|&i| self.mask & (1 << (CAP - i - 1)) != 0)
+            .collect()
     }
 
     fn elems_before(&self, pos: usize) -> usize {
