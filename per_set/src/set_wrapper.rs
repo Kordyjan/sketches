@@ -10,7 +10,7 @@ use crate::PerMap;
 #[derive(Debug, Clone)]
 pub struct PerSet<K, S = FxBuildHasher>(PerMap<K, (), S>);
 
-impl PerSet {
+impl<K> PerSet<K> {
     #[must_use]
     pub fn empty() -> Self {
         PerSet(PerMap::empty())
@@ -58,7 +58,7 @@ where
     }
 
     #[must_use]
-    pub fn union(&self, other: &PerSet<K, S, V>) {
+    pub fn union(&self, other: &PerSet<K, S>) -> Self {
         PerSet(self.0.union(&other.0))
     }
 }
