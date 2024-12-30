@@ -1,0 +1,20 @@
+[package]
+name = "queries"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rustc-stable-hash = "0.1"
+anyhow = "1"
+per_set = { path = "../per_set" }
+rustc-hash = "2"
+smallvec = { version = "1", features = ["union", "const_generics"] }
+trait-variant = "0.1.2"
+
+[dev-dependencies]
+test_utils = { path = "../test_utils" }
+proptest = "1"
+futures = "0.3.31"
+
+[lints]
+workspace = true
