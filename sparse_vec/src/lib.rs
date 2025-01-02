@@ -85,6 +85,13 @@ impl<const CAP: usize, T> SparseVec<CAP, T> {
             .collect()
     }
 
+    pub fn iter(&self) -> Iter<'_, CAP, T> {
+        Iter {
+            index: 0,
+            vector: self,
+        }
+    }
+
     fn elems_before(&self, pos: usize) -> usize {
         (self.mask >> (CAP - pos)).count_ones() as usize
     }
@@ -95,6 +102,36 @@ impl<const CAP: usize, T: Clone> Clone for SparseVec<CAP, T> {
         Self {
             mask: self.mask,
             data: self.data.clone(),
+        }
+    }
+}
+
+impl<'a, const CAP: usize, T> IntoIterator for &'a SparseVec<CAP, T> {
+    type Item = &'a T;
+
+    type IntoIter = Iter<'a, CAP, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+pub struct Iter<'a, const CAP: usize, T> {
+    index: usize,
+    vector: &'a SparseVec<CAP, T>,
+}
+
+impl<'a, const CAP: usize, T> Iterator for Iter<'a, CAP, T> {
+    type Item = &'a T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        println!("{} / {}", self.index, self.vector.len());
+        if self.index == self.vector.len() {
+            None
+        } else {
+            let res = Some(&self.vector.data[self.index]);
+            self.index += 1;
+            res
         }
     }
 }

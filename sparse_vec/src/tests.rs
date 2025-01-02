@@ -19,7 +19,7 @@ proptest! {
     #[test]
     fn elements_can_be_retrieved(elems in hash_map(0usize..16, ".*", 0usize..5)) {
         let mut sparse_vec = SparseVec::<16, String>::new();
-        for (pos, elem) in elems.iter() {
+        for (pos, elem) in &elems {
             sparse_vec.insert(*pos, elem.clone());
         }
         for (pos, elem) in elems {
@@ -30,7 +30,7 @@ proptest! {
     #[test]
     fn elements_can_be_overwritten((elems, selected) in map_with_selected(5, 0usize..16)) {
         let mut sparse_vec = SparseVec::<16, String>::new();
-        for (pos, elem) in elems.iter() {
+        for (pos, elem) in &elems {
             sparse_vec.insert(*pos, elem.clone());
         }
 
@@ -46,7 +46,7 @@ proptest! {
     #[test]
     fn elemenets_can_be_swapped((elems, selected) in map_with_selected(5, 0usize..16)) {
         let mut sparse_vec = SparseVec::<16, String>::new();
-        for (pos, elem) in elems.iter() {
+        for (pos, elem) in &elems {
             sparse_vec.insert(*pos, elem.clone());
         }
 
@@ -54,15 +54,16 @@ proptest! {
 
         let old_value = sparse_vec.swap(selected, new_value.clone());
         prop_assert_eq!(Some(&new_value), sparse_vec.get(selected));
-        prop_assert_eq!(elems.get(&selected).map(String::clone), old_value);
+        prop_assert_eq!(elems.get(&selected).cloned(), old_value);
         for e in elems.keys().filter(|e| **e != selected) {
             prop_assert_eq!(elems.get(e), sparse_vec.get(*e));
         }
     }
 
-    #[test] fn non_existing_elements_can_be_swapped(elems in hash_map(0usize..16, ".*", 0usize..5)) {
+    #[test]
+    fn non_existing_elements_can_be_swapped(elems in hash_map(0usize..16, ".*", 0usize..5)) {
         let mut sparse_vec = SparseVec::<16, String>::new();
-        for (pos, elem) in elems.iter() {
+        for (pos, elem) in &elems {
             sparse_vec.insert(*pos, elem.clone());
         }
 
@@ -80,28 +81,43 @@ proptest! {
     #[test]
     fn elements_can_be_removed((elems, selected) in map_with_selected(5, 0usize..16)) {
         let mut sparse_vec = SparseVec::<16, String>::new();
-        for (pos, elem) in elems.iter() {
+        for (pos, elem) in &elems {
             sparse_vec.insert(*pos, elem.clone());
         }
 
         let old_value = sparse_vec.remove(selected);
         prop_assert_eq!(None, sparse_vec.get(selected));
-        prop_assert_eq!(elems.get(&selected).map(String::clone), old_value)
+        prop_assert_eq!(elems.get(&selected).cloned(), old_value);
     }
 
     #[test]
     fn not_inserted_elements_are_empty(elems in hash_map(0usize..16, ".*", 0usize..5)) {
         let mut sparse_vec = SparseVec::<16, String>::new();
-        for (pos, elem) in elems.iter() {
+        for (pos, elem) in &elems {
             sparse_vec.insert(*pos, elem.clone());
         }
 
         for id in (0usize..16).collect::<HashSet<_>>()
-            .difference(&elems.keys()
-            .map(|u| *u)
+            .difference(&elems.keys().copied()
             .collect::<HashSet<_>>()) {
             prop_assert_eq!(None, sparse_vec.get(*id));
-            ()
         }
+    }
+
+    #[test]
+    fn iteration_returns_correctly_ordered_elements(elems in hash_map(0usize..16, ".*", 0usize..5)) {
+        let mut sparse_vec = SparseVec::<16, String>::new();
+        for (pos, elem) in &elems {
+            sparse_vec.insert(*pos, elem.clone());
+        }
+
+        let res = sparse_vec.iter().collect::<Vec<_>>();
+
+        let mut expected = elems.iter().collect::<Vec<_>>();
+        expected.sort();
+        let expected = expected.into_iter().map(|(_, e)| e).collect::<Vec<_>>();
+
+        prop_assert_eq!(expected, res);
+
     }
 }
