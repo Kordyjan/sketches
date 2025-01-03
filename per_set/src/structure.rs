@@ -1,3 +1,4 @@
+
 use std::{
     borrow::Borrow, hash::{BuildHasher, Hash}, sync::Arc
 };
@@ -8,7 +9,7 @@ use crate::nodes::{BitShifter, Node};
 
 #[derive(Clone, Debug)]
 pub struct PerMap<K, V, S = FxBuildHasher> {
-    data: Arc<Node<K, V>>,
+    pub(crate) data: Arc<Node<K, V>>,
     hasher: S,
 }
 
@@ -39,6 +40,10 @@ impl<K, V, S> PerMap<K, V, S> {
 
     pub fn is_empty(&self) -> bool {
     self.data.weight() == 0
+    }
+
+    pub fn iter(&self) -> crate::iter::Iter<'_, K, V> {
+        crate::iter::Iter::new(self)
     }
 }
 
@@ -72,9 +77,20 @@ where
 
     #[must_use]
     pub fn union(&self, other: &PerMap<K, V, S>) -> Self {
-        PerMap {
+        PerMap { 
             data: Node::merge(&self.data, &other.data),
             hasher: self.hasher.clone(),
         }
     }
 }
+
+impl <'a, K, V, S> IntoIterator for &'a PerMap<K, V, S> {
+    type Item = &'a Arc<(K, V)>;
+
+    type IntoIter = crate::iter::Iter<'a, K, V>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        crate::iter::Iter::new(self)
+    }
+}
+

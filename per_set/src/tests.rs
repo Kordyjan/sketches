@@ -74,28 +74,44 @@ proptest! {
     ) {
         let left = left_only.iter()
             .chain(common.iter())
-            .map(|(k, v)| (k.clone(), v.clone()))
+            .map(|(k, v)| (*k, v.clone()))
             .collect::<HashMap<_, _>>();
 
         let right = right_only.iter()
             .chain(common.iter())
-            .map(|(k, v)| (k.clone(), v.clone()))
+            .map(|(k, v)| (*k, v.clone()))
             .collect::<HashMap<_, _>>();
 
         let left_map = left.iter().fold(PerMap::<u64, String>::empty(), |m, (k, v)| m.insert(*k, v.clone()));
         let right_map = right.iter().fold(PerMap::<u64, String>::empty(), |m, (k, v)| m.insert(*k, v.clone()));
 
-        let keys = left_only.keys().chain(right_only.keys()).chain(common.keys()).map(|u| *u).collect::<HashSet<_>>();
+        let keys = left_only.keys().chain(right_only.keys()).chain(common.keys()).copied().collect::<HashSet<_>>();
 
         let res = left_map.union(&right_map);
 
         prop_assert_eq!(keys.len(), res.len());
         for k in keys {
-            prop_assert!(res.get(&k).is_some())
+            prop_assert!(res.get(&k).is_some());
         }
 
         for (k, v) in right {
             prop_assert_eq!(Some(&v), res.get(&k));
+        }
+    }
+
+    #[test]
+    fn iterator_returns_all_elements(elems in hash_map(0u64..1024, "\\w{1,7}", 0usize..16)) {
+        let map = PerMap::<u64, String>::empty();
+
+        let map = elems.iter().fold(map, |m, (k, v)| m.insert(*k, v.clone()));
+
+        let count = map.iter().count();
+        
+        prop_assert_eq!(map.len(), count);
+
+        for entry in &map {
+            let (key, value) = &**entry;
+            prop_assert_eq!(elems.get(key), Some(value));
         }
     }
 
