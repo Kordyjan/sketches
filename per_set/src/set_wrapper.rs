@@ -1,11 +1,13 @@
 use std::{
     borrow::Borrow,
     hash::{BuildHasher, Hash},
+    ops::Deref,
+    sync::Arc,
 };
 
 use rustc_hash::FxBuildHasher;
 
-use crate::PerMap;
+use crate::{iter, PerMap};
 
 #[derive(Debug, Clone)]
 pub struct PerSet<K, S = FxBuildHasher>(PerMap<K, (), S>);
@@ -60,5 +62,25 @@ where
     #[must_use]
     pub fn union(&self, other: &PerSet<K, S>) -> Self {
         PerSet(self.0.union(&other.0))
+    }
+}
+
+pub struct Element<'a, K>(&'a Arc<(K, ())>);
+
+impl<'a, T> Deref for Element<'a, T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0.as_ref().0
+    }
+}
+
+pub struct Iter<'a, K>(pub(crate) iter::Iter<'a, K, ()>);
+
+impl<'a, T> Iterator for Iter<'a, T> {
+    type Item = Element<'a, T>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.0.next().map(Element)
     }
 }
