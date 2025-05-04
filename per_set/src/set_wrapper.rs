@@ -67,7 +67,7 @@ where
 
 pub struct Element<'a, K>(&'a Arc<(K, ())>);
 
-impl<'a, T> Deref for Element<'a, T> {
+impl<T> Deref for Element<'_, T> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {

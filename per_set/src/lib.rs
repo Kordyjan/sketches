@@ -1,7 +1,7 @@
+pub mod iter;
 mod nodes;
 mod set_wrapper;
 mod structure;
-pub mod iter;
 
 #[cfg(test)]
 mod tests;

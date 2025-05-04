@@ -6,3 +6,7 @@ resolver = "2"
 [workspace.lints.clippy]
 pedantic = { level = "warn", priority = -1 }
 cast_possible_truncation = "allow"
+missing_errors_doc = "allow"
+
+# bugs around Future<_> + Send
+manual_async_fn = "allow" 

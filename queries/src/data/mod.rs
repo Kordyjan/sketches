@@ -1,11 +1,61 @@
-use std::{any::Any, borrow::Cow, marker::PhantomData, sync::Arc};
-
 use crate::serialization::{Reader, Writer};
 use anyhow::Result;
+use std::fmt::Debug;
+use std::{any::Any, borrow::Cow, fmt::Display, marker::PhantomData, sync::Arc};
 
 pub mod instances;
 
-pub trait Object: ObjectDowncast + Send + Sync + 'static {
+pub trait QueryResponse: Send + Sync + 'static {
+    type Boxed: Send + Sync + 'static;
+
+    fn into_object(self) -> Arc<dyn Object>;
+
+    fn downcast(object: Arc<dyn Object>) -> Result<Self::Boxed>;
+}
+
+pub struct ErasedResponse(pub Arc<dyn Object>);
+
+impl QueryResponse for ErasedResponse {
+    type Boxed = Arc<dyn Object>;
+    fn into_object(self) -> Arc<dyn Object> {
+        self.0
+    }
+
+    fn downcast(object: Arc<dyn Object>) -> Result<Self::Boxed> {
+        Ok(object)
+    }
+}
+
+impl<T: Object> QueryResponse for Arc<T> {
+    type Boxed = Arc<T>;
+    fn into_object(self) -> Arc<dyn Object> {
+        self
+    }
+
+    fn downcast(object: Arc<dyn Object>) -> Result<Self::Boxed> {
+        object
+            .as_any()
+            .downcast::<T>()
+            .map_err(|_| anyhow::anyhow!("invalid type"))
+    }
+}
+
+impl<T: Object> QueryResponse for T {
+    type Boxed = Arc<T>;
+
+    fn into_object(self) -> Arc<dyn Object> {
+        Arc::new(self)
+    }
+
+    fn downcast(object: Arc<dyn Object>) -> Result<Self::Boxed> {
+        object
+            .as_any()
+            .downcast::<T>()
+            .map_err(|_| anyhow::anyhow!("invalid type"))
+    }
+}
+
+pub trait Object: ObjectDowncast + Debug + Send + Sync + 'static {
     fn write(&self, writer: &mut dyn Writer);
 }
 
@@ -28,12 +78,15 @@ impl<U: Object> ObjectDowncast for U {
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Param<T> {
     id: QueryId,
-    phantom: PhantomData<T>
+    phantom: PhantomData<T>,
 }
- 
+
 impl<T> Param<T> {
     pub const fn new(s: &'static str) -> Self {
-        Self { id: QueryId::new_static(s), phantom: PhantomData }
+        Self {
+            id: QueryId::new_static(s),
+            phantom: PhantomData,
+        }
     }
 
     pub(crate) fn query_id(&self) -> &QueryId {
@@ -54,4 +107,8 @@ impl QueryId {
     }
 }
 
-
+impl Display for QueryId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "[{}]", &*self.0)
+    }
+}

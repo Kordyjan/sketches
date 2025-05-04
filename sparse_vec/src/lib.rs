@@ -125,7 +125,6 @@ impl<'a, const CAP: usize, T> Iterator for Iter<'a, CAP, T> {
     type Item = &'a T;
 
     fn next(&mut self) -> Option<Self::Item> {
-        println!("{} / {}", self.index, self.vector.len());
         if self.index == self.vector.len() {
             None
         } else {

@@ -1,4 +1,4 @@
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 
 use crate::serialization::{Reader, Writer};
 
@@ -21,7 +21,25 @@ impl ReadObject for u64 {
         }
         let mut buf = [0u8; 8];
         buf.copy_from_slice(slice);
-        Ok(u64::from_le_bytes(buf))
+        Ok(u64::from_be_bytes(buf))
+    }
+}
+
+impl Object for usize {
+    fn write(&self, writer: &mut dyn Writer) {
+        writer.write(&u64::to_be_bytes(*self as u64));
+    }
+}
+
+impl ReadObject for usize {
+    fn read(reader: &mut impl Reader) -> Result<Self> {
+        let slice = reader.read(size_of::<usize>());
+        if slice.len() != size_of::<u64>() {
+            bail!("missing bytes to read usize");
+        }
+        let mut buf = [0u8; size_of::<usize>()];
+        buf.copy_from_slice(slice);
+        Ok(usize::from_be_bytes(buf))
     }
 }
 

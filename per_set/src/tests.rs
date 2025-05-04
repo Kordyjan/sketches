@@ -106,7 +106,7 @@ proptest! {
         let map = elems.iter().fold(map, |m, (k, v)| m.insert(*k, v.clone()));
 
         let count = map.iter().count();
-        
+
         prop_assert_eq!(map.len(), count);
 
         for entry in &map {

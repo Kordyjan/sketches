@@ -5,3 +5,22 @@
 # It is recommended to check this file in to source control so that
 # everyone who runs the test benefits from these saved cases.
 cc 6002e12272b47b39c48f376b3e1fe243d62015506038bfcf2e969b6b58ac24d3 # shrinks to values = []
+cc 213d2be4f15fe33e449cce87d58d2313b3d9d027d0c1939b15a480ed16b20a5e # shrinks to values = [572, 651, 513, 207, 266, 709, 37, 418, 11, 476, 341]
+cc af73a436f05f3d29ba454c0fe311dce8efde3c6d2462ced36bf58fad87cbd8d9 # shrinks to values = [190, 347, 866, 547, 985, 986, 855, 587, 963, 307, 1019, 698, 451, 31, 189]
+cc 681cb7ffe5ba0f54acd0a7c3d3455d77223f6dd2b67f8b2c85c2219eeb767bf9 # shrinks to (mut values, (inc, dec)) = ([106, 533, 638, 263, 709, 844, 504, 487, 412], (5, 0))
+cc a2ba75a8353a8b45546dac5bd4d2166131ede085c7f5832ef71fd81f18288d4b # shrinks to (mut values, (inc, dec)) = ([479, 259, 757, 375, 356, 347], (5, 3))
+cc 558966a9be1373eb3a3b5ec26ef17e404319bac0ab79437a8a1373d6e8956db0 # shrinks to (mut values, (inc, dec)) = ([258, 418, 437, 794, 247, 327, 200, 913, 408], (3, 0))
+cc f4958ce4747ae8820b91397f815304a04de900d0734d6cafb7f0afb4af0e895b # shrinks to (mut values, (inc, dec)) = ([536, 643, 169, 372, 67, 242, 18, 876], (2, 1))
+cc a3863751bb7466a4c5f95a3e6de07543d2661365cdfd80d2cb70591cc4d251bb # shrinks to (mut values, (inc, dec)) = ([246, 847, 261, 999, 933, 857, 634, 909], (5, 0))
+cc 9699507b2ad35e7cac752171706192ee0eaee68d6340db050e51133a1e26d0c7 # shrinks to (mut values, (inc, dec)) = ([424, 251, 623, 46, 876, 542, 932, 318, 337], (3, 4))
+cc 7ef205e0161db9ccfd0cb6ea01fd54f0e2482c64216629dd556b37baebe75bda # shrinks to (mut values, (inc, dec)) = ([93, 767, 775, 672, 368, 778, 150], (6, 3))
+cc 3b1096c0c0ff69f268b61f2ca345f60518dd3489f1ff24ba0948c415b9ffd6b7 # shrinks to (mut values, (inc, dec)) = ([530, 155, 381, 826, 1019, 395, 808, 418], (0, 1))
+cc a8ee94cc1514e323bfab0c3442018ed9005e876773063a8aba995bdb7ccbad5a # shrinks to (mut values, (inc, dec)) = ([1017, 488, 344, 11, 195, 610, 337], (1, 3))
+cc 9d9e1551efca9e9d8ef96234f9b291d7106d30225fbed623d15b614293c55e24 # shrinks to (mut values, (inc, dec)) = ([745, 829, 12, 725, 17, 805, 716], (2, 5))
+cc 8efb1938e78634bcd5d4179a109148f62bb9b1578b13c716ba2ac7caae572bce # shrinks to (mut values, (inc, dec)) = ([449, 342, 226, 204, 233, 1013, 782, 789, 511], (3, 1))
+cc cec8a973c08f87dc592e2a16235fe0e2962d89ff7d4b2f2bd0e21148afab4673 # shrinks to (mut values, (inc, dec)) = ([755, 666, 96, 902, 404, 503, 893], (0, 5))
+cc c76439ef909ebe90f015c675ecabdc35c3ec58eb0c054232cbbfe887d4be21d8 # shrinks to (mut values, (inc, dec)) = ([164, 745, 437, 916, 482, 315, 275], (5, 2))
+cc 2bbb51800cdf543479ea76f5e1cf12ea50d759df3d94d1f04dd6d5d88aa37e15 # shrinks to (mut values, (inc, dec)) = ([455, 590, 845, 95, 753, 443, 8, 878, 47], (1, 5))
+cc 1711382f475eee07a00ae59ef636ccf0868bfeefa918174c7ba3f0f3a9405f47 # shrinks to (mut values, (inc, dec)) = ([15, 712, 464, 663, 226, 197, 618, 566, 450], (2, 1))
+cc bb3394c69879d9164fef25676da204697994f1490b143a29ada1efc7d2b322e2 # shrinks to (mut values, (inc, dec)) = ([510, 265, 84, 91, 64, 671], (2, 1))
+cc 043896a0b5b841f312998e6d2d779a1e7fd311d288ac31840505848c8b8cf4ac # shrinks to (mut values, (inc, dec)) = ([0, 0, 0, 0], (0, 1))

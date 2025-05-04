@@ -1,7 +1,7 @@
 [package]
 name = "queries"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 rustc-stable-hash = "0.1"
@@ -9,12 +9,15 @@ anyhow = "1"
 per_set = { path = "../per_set" }
 rustc-hash = "2"
 smallvec = { version = "1", features = ["union", "const_generics"] }
-trait-variant = "0.1.2"
+trait-variant = "0.1"
+async-std = "1"
+futures = "0.3.31"
+async-global-executor = "2.4.1"
+dashmap = { version = "6.1.0", features = ["inline"] }
 
 [dev-dependencies]
-test_utils = { path = "../test_utils" }
-proptest = "1"
-futures = "0.3.31"
+proptest = "1.6"
+futures = "0.3"
 
 [lints]
 workspace = true

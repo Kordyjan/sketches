@@ -35,11 +35,13 @@ impl<'a, K, V> Iterator for Iter<'a, K, V> {
                     Some(next) => match next.as_ref() {
                         Node::Leaf { data, .. } => Step::Ret(data.iter()),
                         Node::Branch { data, .. } => Step::Push(data.iter()),
-                    } 
+                    },
                 };
 
                 match step {
-                    Step::Pop => { self.stack.pop(); },
+                    Step::Pop => {
+                        self.stack.pop();
+                    }
                     Step::Push(next) => self.stack.push(next),
                     Step::Ret(mut li) => {
                         let next_leaf = li.next();
@@ -57,5 +59,5 @@ impl<'a, K, V> Iterator for Iter<'a, K, V> {
 enum Step<'a, K, V> {
     Pop,
     Push(sparse_vec::Iter<'a, 16, Arc<Node<K, V>>>),
-    Ret(slice::Iter<'a, Arc<(K, V)>>)
+    Ret(slice::Iter<'a, Arc<(K, V)>>),
 }

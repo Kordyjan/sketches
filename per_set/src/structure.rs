@@ -1,6 +1,7 @@
-
 use std::{
-    borrow::Borrow, hash::{BuildHasher, Hash}, sync::Arc
+    borrow::Borrow,
+    hash::{BuildHasher, Hash},
+    sync::Arc,
 };
 
 use rustc_hash::FxBuildHasher;
@@ -39,7 +40,7 @@ impl<K, V, S> PerMap<K, V, S> {
     }
 
     pub fn is_empty(&self) -> bool {
-    self.data.weight() == 0
+        self.data.weight() == 0
     }
 
     pub fn iter(&self) -> crate::iter::Iter<'_, K, V> {
@@ -77,14 +78,14 @@ where
 
     #[must_use]
     pub fn union(&self, other: &PerMap<K, V, S>) -> Self {
-        PerMap { 
+        PerMap {
             data: Node::merge(&self.data, &other.data),
             hasher: self.hasher.clone(),
         }
     }
 }
 
-impl <'a, K, V, S> IntoIterator for &'a PerMap<K, V, S> {
+impl<'a, K, V, S> IntoIterator for &'a PerMap<K, V, S> {
     type Item = &'a Arc<(K, V)>;
 
     type IntoIter = crate::iter::Iter<'a, K, V>;
@@ -93,4 +94,3 @@ impl <'a, K, V, S> IntoIterator for &'a PerMap<K, V, S> {
         crate::iter::Iter::new(self)
     }
 }
-

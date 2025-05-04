@@ -3,8 +3,6 @@ use std::sync::Arc;
 use crate::Object;
 use anyhow::Result;
 
-pub struct WriterContext;
-
 pub trait Writer {
     fn write(&mut self, data: &[u8]);
     fn write_object(&mut self, object: &dyn Object);
