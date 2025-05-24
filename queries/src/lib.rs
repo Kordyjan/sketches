@@ -1,13 +1,13 @@
 use crate::data::{ErasedResponse, QueryResponse};
 use crate::execution::ExecutionContext;
 use anyhow::Result;
-use data::{Object, Param, QueryId};
+pub use data::{Object, Param, QueryId};
 use futures::future::BoxFuture;
 use std::sync::Arc;
 use std::{any::Any, future::Future};
 
-mod data;
-mod execution;
+pub mod data;
+pub mod execution;
 mod fingerprinting;
 mod serialization;
 

@@ -82,6 +82,7 @@ pub struct Param<T> {
 }
 
 impl<T> Param<T> {
+    #[must_use]
     pub const fn new(s: &'static str) -> Self {
         Self {
             id: QueryId::new_static(s),
