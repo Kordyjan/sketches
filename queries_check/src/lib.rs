@@ -9,7 +9,8 @@ use std::sync::Arc;
 
 pub(crate) mod query;
 
-async fn nonlocking_scenario(rng: &mut impl Rng, input_size: usize, process_count: usize) {
+#[allow(dead_code)]
+async fn immutable_scenario(rng: &mut impl Rng, input_size: usize, process_count: usize) {
     let input: Vec<u64> = iter::repeat_with(|| rng.random::<u64>())
         .take(input_size)
         .collect();
