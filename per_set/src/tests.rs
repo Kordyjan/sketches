@@ -1,6 +1,7 @@
 use std::{
     collections::{HashMap, HashSet},
     hash::{BuildHasher, Hasher},
+    iter,
 };
 
 use super::PerMap;
@@ -97,6 +98,67 @@ proptest! {
         for (k, v) in right {
             prop_assert_eq!(Some(&v), res.get(&k));
         }
+    }
+
+    #[test]
+    fn non_overriding_union_of_maps_finishes_successfully_when_elements_are_disjoint(
+        left_side in hash_map(0u64..1024, "\\w{1,7}", 0usize..16),
+        right_side in hash_map(1024u64..2048, "\\w{1,7}", 0usize..16)
+    ) {
+        let keys = left_side.keys().chain(right_side.keys()).copied().collect::<HashSet<_>>();
+
+        let left_map = left_side.iter().fold(PerMap::<u64, String>::empty(), |m, (k, v)| m.insert(*k, v.clone()));
+        let right_map = right_side.iter().fold(PerMap::<u64, String>::empty(), |m, (k, v)| m.insert(*k, v.clone()));
+
+        let res = left_map.non_overriding_union(&right_map);
+
+        prop_assert!(res.is_ok());
+        let res = res.unwrap();
+        let res_keys = res.iter()
+            .map(|a| a.0)
+            .collect::<HashSet<_>>();
+        prop_assert_eq!(keys, res_keys);
+    }
+
+    #[test]
+    fn non_overriding_union_of_maps_finishes_successfully_when_overlapping_elements_has_the_same_value(
+        left_side in hash_map(0u64..1024, "\\w{1,7}", 0usize..16),
+        right_side in hash_map(1024u64..2048, "\\w{1,7}", 0usize..16),
+        common in hash_map(2048u64..3096, "\\w{1,7}", 0usize..16)
+    ) {
+        let keys = left_side.keys().chain(right_side.keys()).chain(common.keys()).copied().collect::<HashSet<_>>();
+
+        let left_map = left_side.iter().chain(common.iter()).map(|(k, v)| (*k, v.clone())).collect::<PerMap<_, _>>();
+        let right_map = right_side.iter().chain(common.iter()).map(|(k, v)| (*k, v.clone())).collect::<PerMap<_, _>>();
+
+        let res = left_map.non_overriding_union(&right_map);
+        prop_assert!(res.is_ok());
+        let res = res.unwrap();
+        let res_keys = res.iter()
+            .map(|a| a.0)
+            .collect::<HashSet<_>>();
+        prop_assert_eq!(keys, res_keys);
+    }
+
+    #[test]
+    fn non_overriding_union_of_maps_fails_when_overlapping_elements_has_different_values(
+        left_side in hash_map(0u64..1024, "[a-z]{1,7}", 0usize..16),
+        right_side in hash_map(1024u64..2048, "[a-z]{1,7}", 0usize..16),
+        common_key in 2048u64..3096,
+        common_value_left in "[a-z]{1,7}"
+    ) {
+        let common_value_right = common_value_left.clone() + "abc";
+        let left_map = left_side.iter()
+            .chain(iter::once((&common_key, &common_value_left)))
+            .map(|(k, v)| (*k, v.clone()))
+            .collect::<PerMap<_, _>>();
+        let right_map = right_side.iter()
+            .chain(iter::once((&common_key, &common_value_right)))
+            .map(|(k, v)| (*k, v.clone()))
+            .collect::<PerMap<_, _>>();
+
+        let res = left_map.non_overriding_union(&right_map);
+        prop_assert!(res.is_err());
     }
 
     #[test]

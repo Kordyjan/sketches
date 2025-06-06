@@ -1,10 +1,10 @@
+use rustc_hash::FxBuildHasher;
+use std::fmt::Debug;
 use std::{
     borrow::Borrow,
     hash::{BuildHasher, Hash},
     sync::Arc,
 };
-
-use rustc_hash::FxBuildHasher;
 
 use crate::nodes::{BitShifter, Node};
 
@@ -85,6 +85,20 @@ where
     }
 }
 
+impl<K, V, S> PerMap<K, V, S>
+where
+    K: Eq + Hash + Debug,
+    S: BuildHasher + Clone,
+    V: PartialEq + Debug,
+{
+    pub fn non_overriding_union(&self, other: &PerMap<K, V, S>) -> Result<Self, ()> {
+        Ok(PerMap {
+            data: Node::merge_without_overwrites(&self.data, &other.data)?,
+            hasher: self.hasher.clone(),
+        })
+    }
+}
+
 impl<'a, K, V, S> IntoIterator for &'a PerMap<K, V, S> {
     type Item = &'a Arc<(K, V)>;
 
@@ -92,5 +106,18 @@ impl<'a, K, V, S> IntoIterator for &'a PerMap<K, V, S> {
 
     fn into_iter(self) -> Self::IntoIter {
         crate::iter::Iter::new(self)
+    }
+}
+
+impl<K, V, S> FromIterator<(K, V)> for PerMap<K, V, S>
+where
+    K: Eq + Hash,
+    S: BuildHasher + Clone + Default,
+{
+    fn from_iter<T: IntoIterator<Item = (K, V)>>(iter: T) -> Self {
+        iter.into_iter().fold(
+            PerMap::<K, V, S>::with_hasher(S::default()),
+            |acc, (k, v)| acc.insert(k, v),
+        )
     }
 }

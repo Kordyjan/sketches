@@ -182,6 +182,64 @@ impl<K: Eq, V> Node<K, V> {
     }
 }
 
+impl<K: Eq + Debug, V: PartialEq + Debug> Node<K, V> {
+    pub fn merge_without_overwrites(
+        left: &Arc<Node<K, V>>,
+        right: &Arc<Node<K, V>>,
+    ) -> Result<Arc<Node<K, V>>, ()> {
+        match (&**left, &**right) {
+            (
+                Node::Leaf {
+                    data: left_data, ..
+                },
+                Node::Leaf {
+                    data: right_data, ..
+                },
+            ) => {
+                let mut res = left_data.clone();
+                for r in right_data {
+                    if let Some(p) = res.iter().position(|e| e.0 == r.0) {
+                        if res[p].1 != r.1 {
+                            return Err(());
+                        }
+                    } else {
+                        res.push(Arc::clone(r));
+                    }
+                }
+                let weight = res.len();
+                Ok(Arc::new(Node::Leaf { data: res, weight }))
+            }
+            (
+                Node::Branch {
+                    data: left_data, ..
+                },
+                Node::Branch {
+                    data: right_data, ..
+                },
+            ) => {
+                let mut res = left_data.clone();
+                for k in right_data.keys() {
+                    if let Some(node) = left_data.get(k) {
+                        res.insert(
+                            k,
+                            Node::merge_without_overwrites(node, right_data.get(k).unwrap())?,
+                        );
+                    } else {
+                        res.insert(k, right_data.get(k).unwrap().clone());
+                    }
+                }
+                let weight = res
+                    .keys()
+                    .into_iter()
+                    .map(|k| res.get(k).unwrap().weight())
+                    .sum();
+                Ok(Arc::new(Node::Branch { data: res, weight }))
+            }
+            _ => unreachable!(),
+        }
+    }
+}
+
 impl<K: Debug, V: Debug> Debug for Node<K, V> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         inner_print(self, f, "")
