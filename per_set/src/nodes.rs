@@ -8,6 +8,11 @@ use std::{
 use smallvec::{smallvec, SmallVec};
 use sparse_vec::SparseVec;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum MergeError<K, V> {
+    ValueConflict { key: K, left_value: V, right_value: V },
+}
+
 pub enum Node<K, V> {
     Leaf {
         data: SmallVec<[Arc<(K, V)>; 2]>,
@@ -182,11 +187,11 @@ impl<K: Eq, V> Node<K, V> {
     }
 }
 
-impl<K: Eq + Debug, V: PartialEq + Debug> Node<K, V> {
+impl<K: Eq + Debug + Clone, V: PartialEq + Debug + Clone> Node<K, V> {
     pub fn merge_without_overwrites(
         left: &Arc<Node<K, V>>,
         right: &Arc<Node<K, V>>,
-    ) -> Result<Arc<Node<K, V>>, ()> {
+    ) -> Result<Arc<Node<K, V>>, MergeError<K, V>> {
         match (&**left, &**right) {
             (
                 Node::Leaf {
@@ -200,7 +205,11 @@ impl<K: Eq + Debug, V: PartialEq + Debug> Node<K, V> {
                 for r in right_data {
                     if let Some(p) = res.iter().position(|e| e.0 == r.0) {
                         if res[p].1 != r.1 {
-                            return Err(());
+                            return Err(MergeError::ValueConflict {
+                                key: r.0.clone(),
+                                left_value: res[p].1.clone(),
+                                right_value: r.1.clone(),
+                            });
                         }
                     } else {
                         res.push(Arc::clone(r));

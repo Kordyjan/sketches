@@ -6,7 +6,7 @@ use std::{
     sync::Arc,
 };
 
-use crate::nodes::{BitShifter, Node};
+use crate::nodes::{BitShifter, MergeError, Node};
 
 #[derive(Clone, Debug)]
 pub struct PerMap<K, V, S = FxBuildHasher> {
@@ -87,11 +87,11 @@ where
 
 impl<K, V, S> PerMap<K, V, S>
 where
-    K: Eq + Hash + Debug,
+    K: Eq + Hash + Debug + Clone,
     S: BuildHasher + Clone,
-    V: PartialEq + Debug,
+    V: PartialEq + Debug + Clone,
 {
-    pub fn non_overriding_union(&self, other: &PerMap<K, V, S>) -> Result<Self, ()> {
+    pub fn non_overriding_union(&self, other: &PerMap<K, V, S>) -> Result<Self, MergeError<K, V>> {
         Ok(PerMap {
             data: Node::merge_without_overwrites(&self.data, &other.data)?,
             hasher: self.hasher.clone(),

@@ -5,6 +5,7 @@ use std::{
 };
 
 use super::PerMap;
+use crate::nodes::MergeError;
 use proptest::{collection::hash_map, prelude::*};
 use test_utils::map_with_selected;
 
@@ -159,6 +160,14 @@ proptest! {
 
         let res = left_map.non_overriding_union(&right_map);
         prop_assert!(res.is_err());
+
+        if let Err(MergeError::ValueConflict { key, left_value, right_value }) = res {
+            prop_assert_eq!(key, common_key);
+            prop_assert_eq!(left_value, common_value_left);
+            prop_assert_eq!(right_value, common_value_right);
+        } else {
+            prop_assert!(false, "Expected ValueConflict error");
+        }
     }
 
     #[test]
