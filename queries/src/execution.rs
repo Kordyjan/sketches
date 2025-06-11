@@ -1,23 +1,22 @@
 use crate::data::{ErasedResponse, QueryResponse};
 use crate::{
-    ErasedQuery, Executor, Query,
-    data::{Object, Param, QueryId},
-    fingerprinting::{Fingerprint, stamp_with_fingerprint},
+    data::{Object, Param, QueryId}, fingerprinting::{stamp_with_fingerprint, Fingerprint}, ErasedQuery,
+    Executor,
+    Query,
 };
-use ::core::future::Future;
-use anyhow::{Context, Result, anyhow, bail};
-use async_std::{
-    channel::Sender,
-    channel::{self, Receiver},
-    stream::StreamExt,
-    sync::Mutex,
-};
+use anyhow::{anyhow, bail, Context, Result};
 use dashmap::{DashMap, DashSet};
-use futures::FutureExt;
-use futures::stream::FuturesUnordered;
+use futures::channel::mpsc::{UnboundedReceiver, UnboundedSender};
+use futures::{
+    channel::mpsc::{self}, lock::Mutex, stream::FuturesUnordered, FutureExt,
+    StreamExt,
+    TryStream,
+    TryStreamExt,
+};
 use per_set::{PerMap, PerSet};
 use rustc_hash::FxBuildHasher;
 use smallvec::SmallVec;
+use std::fmt::Write;
 use std::{
     iter,
     pin::Pin,
@@ -37,9 +36,8 @@ type QDashMap<V> = DashMap<QueryId, V, FxBuildHasher>;
 
 pub struct Reactor {
     params: QDashMap<(Fingerprint, Arc<dyn Object>)>,
-    trace: Mutex<Vec<String>>,
-    trace_sender: Sender<String>,
-    trace_receiver: Receiver<String>,
+    trace: Mutex<(Vec<String>, UnboundedReceiver<String>)>,
+    trace_sender: UnboundedSender<String>,
     cache: QDashMap<Cached>,
     current: QDashMap<SmallVec<[Waker; 4]>>,
     past_queries: QDashMap<ErasedQuery>,
@@ -53,59 +51,35 @@ impl Default for Reactor {
 
 impl Reactor {
     pub fn new() -> Self {
-        let (trace_sender, trace_receiver) = channel::unbounded();
+        let (trace_sender, trace_receiver) = mpsc::unbounded();
         Reactor {
             params: QDashMap::default(),
-            trace: Mutex::new(Vec::new()),
+            trace: Mutex::new((Vec::new(), trace_receiver)),
             trace_sender,
-            trace_receiver,
             cache: QDashMap::default(),
             current: QDashMap::default(),
             past_queries: QDashMap::default(),
         }
     }
 
-    fn new_continuity(self: &Arc<Self>) -> Continuity {
-        Continuity::new(Arc::clone(self))
+    fn new_continuity(self: &Arc<Self>) -> Arc<Continuity> {
+        Arc::new(Continuity::new(Arc::clone(self)))
     }
 
     fn do_execute<Q, T>(
         self: &Arc<Self>,
         query: Q,
-        view_parent: impl Into<Option<Arc<ExecutionView>>>,
-        continuity: &Arc<Continuity>,
+        parent_context: Option<ExecutionContext>,
     ) -> impl Future<Output = Result<(Fingerprint, T::Boxed)>>
     where
         Q: Query<Response = T> + Send + Sync + 'static,
         T: QueryResponse,
     {
-        let (world_sender, world_receiver) = channel::unbounded();
-        let (direct_sender, direct_receiver) = channel::unbounded();
-        let view_parent = view_parent.into();
-        let dependents = if let Some(view_parent) = &view_parent {
-            &view_parent.dependents
-        } else {
-            &PerSet::empty()
-        };
-        let dependents = dependents.insert(query.id().clone());
-        let view_wrapper = ExecutionContext(Arc::new(ExecutionView {
-            continuity: Arc::clone(continuity),
-            current: query.id(),
-            parent: view_parent,
-            dependents,
-            world_dependencies: world_sender,
-            direct_dependencies: direct_sender,
-        }));
-        DoExecute::new(self, query, view_wrapper, world_receiver, direct_receiver)
+        DoExecute::new(self, query, parent_context)
     }
 
-    fn start_processing<Q, T>(
-        self: &Arc<Self>,
-        query: Q,
-        view_wrapper: ExecutionContext,
-        world_receiver: Receiver<CacheMap>,
-        direct_receiver: Receiver<CacheMap>,
-    ) where
+    fn start_processing<Q, T>(self: &Arc<Self>, query: Q, parent_context: Option<ExecutionContext>)
+    where
         Q: Query<Response = T> + Send + Sync + 'static,
         T: QueryResponse,
     {
@@ -116,58 +90,29 @@ impl Reactor {
             let cache_correct = match reactor.cache.get(&id) {
                 Some(cached) if reactor.verify(&cached.world_state) => true,
                 Some(cached) => {
-                    use futures::StreamExt;
-                    if cached.deps_state.is_empty() {
-                        false
-                    } else {
-                        let deps_state = cached.deps_state.clone();
-                        drop(cached);
-                        let iter = deps_state.iter().map(|state| async {
-                            let Some(query) = reactor.past_queries.get(&state.0) else {
-                                return false;
-                            };
-                            let q = query.clone();
-                            drop(query);
-                            let continuity = Arc::new(reactor.new_continuity());
-                            let result = reactor.do_execute(q, None, &continuity).await;
-                            let res = matches!(result, Ok((f, _)) if f == state.1);
-                            res
-                        });
-
-                        // Collect all results first
-                        let stream = iter.collect::<FuturesUnordered<_>>();
-                        let results = stream.collect::<Vec<_>>().await;
-                        // Then check if all are true
-                        let res = results.iter().all(|&a| a);
-                        res
-                    }
+                    let deps_state = cached.deps_state.clone();
+                    drop(cached);
+                    Self::recheck(&reactor, &id, deps_state).await
                 }
                 None => false,
             };
 
             if !cache_correct {
-                reactor.cache.remove(&id);
-                let result = query.body(&view_wrapper).await;
-                view_wrapper.0.world_dependencies.close();
-                let world_dependencies = world_receiver
-                    .fold(PerMap::empty(), |acc, d| acc.union(&d))
-                    .await;
-                if let Some(parent) = &view_wrapper.0.parent {
-                    let Ok(()) = parent
-                        .world_dependencies
-                        .send(world_dependencies.clone())
+                let (result, world_dependencies, direct_dependencies) = loop {
+                    if let Some(res) = reactor
+                        .run_body_once(query.clone(), parent_context.clone())
                         .await
-                    else {
-                        panic!(
-                            "Could not send world dependencies to the parent of {}",
-                            query.id().clone()
-                        )
-                    };
+                    {
+                        break res;
+                    }
+                };
+
+                if let Some(ExecutionContext(parent)) = parent_context {
+                    let _ = parent
+                        .world_dependencies
+                        .unbounded_send(world_dependencies.clone());
                 }
-                view_wrapper.0.direct_dependencies.close();
-                let direct_dependencies = direct_receiver
-                    .fold(PerMap::empty(), |acc, d| acc.union(&d))
-                    .await;
+
                 let obj = result.map(|v| stamp_with_fingerprint(v.into_object()));
                 reactor.cache.insert(
                     query.id().clone(),
@@ -179,8 +124,7 @@ impl Reactor {
                 );
                 reactor
                     .trace_sender
-                    .send(id.to_string())
-                    .await
+                    .unbounded_send(id.to_string())
                     .expect("Trace channel is broken.");
             }
 
@@ -203,6 +147,108 @@ impl Reactor {
         });
 
         handle.detach();
+    }
+
+    async fn run_body_once<T>(
+        self: &Arc<Self>,
+        query: impl Query<Response = T>,
+        parent_context: Option<ExecutionContext>,
+    ) -> Option<(Result<T>, CacheMap, CacheMap)> {
+        self.cache.remove(&query.id());
+        let (world_sender, mut world_receiver) = mpsc::unbounded();
+        let (direct_sender, mut direct_receiver) = mpsc::unbounded();
+
+        let dependents = parent_context
+            .as_ref()
+            .map(|it| it.0.dependents.clone())
+            .unwrap_or_default()
+            .insert(query.id().clone());
+        let continuity = parent_context
+            .as_ref()
+            .map(|it| it.0.continuity.clone())
+            .unwrap_or_else(|| self.new_continuity().clone());
+        let context = ExecutionContext(Arc::new(ExecutionView {
+            current: query.id().clone(),
+            parent: parent_context.map(|it| it.0),
+            dependents,
+            continuity,
+            world_dependencies: world_sender,
+            direct_dependencies: direct_sender,
+        }));
+
+        let result = query.body(&context).await;
+        context.0.world_dependencies.close_channel();
+        context.0.direct_dependencies.close_channel();
+
+        let mut world_dependencies = CacheMap::empty();
+        let mut direct_dependencies = CacheMap::empty();
+
+        let deps_unique = loop {
+            let Some(dep) = world_receiver.next().await else {
+                break true;
+            };
+            let Ok(sum) = world_dependencies.non_overriding_union(&dep) else {
+                break false;
+            };
+            world_dependencies = sum;
+        } && loop {
+            let Some(dep) = direct_receiver.next().await else {
+                break true;
+            };
+            let Ok(sum) = direct_dependencies.non_overriding_union(&dep) else {
+                break false;
+            };
+            direct_dependencies = sum;
+        };
+
+        deps_unique.then(|| (result, world_dependencies, direct_dependencies))
+    }
+
+    async fn recheck(reactor: &Arc<Reactor>, id: &QueryId, deps_state: CacheMap) -> bool {
+        if deps_state.is_empty() {
+            false
+        } else {
+            let (local_sender, mut local_receiver) = mpsc::unbounded::<CacheMap>();
+            let iter = deps_state.iter().map(|state| async {
+                let Some(query) = reactor.past_queries.get(&state.0) else {
+                    return false;
+                };
+                let q = query.clone();
+                let id = query.id();
+                drop(query);
+                let result = reactor.do_execute(q, None).await;
+
+                let res = matches!(result, Ok((f, _)) if f == state.1);
+                if res {
+                    let world_ref = reactor.cache.get(&id).unwrap().world_state.clone();
+                    let world = world_ref.clone();
+                    drop(world_ref);
+                    if local_sender.unbounded_send(world).is_err() {
+                        return false;
+                    };
+                }
+                res
+            });
+
+            let stream = iter.collect::<FuturesUnordered<_>>();
+            let results = stream.collect::<Vec<_>>().await;
+            let res = results.iter().all(|&a| a);
+            if res {
+                drop(local_sender);
+                let world_state = CacheMap::empty();
+                while let Some(dep) = local_receiver.next().await {
+                    if world_state.non_overriding_union(&dep).is_err() {
+                        return false;
+                    }
+                }
+
+                reactor
+                    .cache
+                    .entry(id.clone())
+                    .and_modify(move |c| c.world_state = world_state);
+            }
+            res
+        }
     }
 
     fn wake(&self, query_id: &QueryId) {
@@ -235,40 +281,51 @@ impl Executor for Arc<Reactor> {
         Q: Query<Response = T> + Sync + Send + 'static,
         T: QueryResponse,
     {
-        self.new_continuity().drive(query)
+        async move {
+            loop {
+                let continuity = self.new_continuity();
+                let res = Arc::clone(&continuity).drive(query.clone()).await?;
+                let world_state = &self
+                    .cache
+                    .get(&query.id())
+                    .context("Cache corrupted")?
+                    .world_state;
+                let mut log = String::new();
+                writeln!(log, "<- {id}", id = query.id()).unwrap();
+                for kv in world_state {
+                    writeln!(log, "\t {k} - {v:?}", k = kv.0, v = kv.1).unwrap();
+                }
+                println!("{log}");
+                if self.verify(world_state) {
+                    break Ok(res);
+                }
+            }
+        }
     }
 
     async fn trace(&self) -> Vec<String> {
         let mut lock = self.trace.lock().await;
-        while let Ok(message) = self.trace_receiver.try_recv() {
-            lock.push(message);
+        while let Some(message) = lock.1.next().await {
+            lock.0.push(message);
         }
-        Vec::clone(&*lock)
+        Vec::clone(&lock.0)
     }
 }
 
 struct DoExecute<Q> {
     reactor: Arc<Reactor>,
-    query_and_view: Option<(Q, ExecutionContext)>,
+    query: Option<Q>,
     query_id: QueryId,
-    world_receiver: Receiver<CacheMap>,
-    direct_receiver: Receiver<CacheMap>,
+    parent_context: Option<ExecutionContext>,
 }
 
 impl<Q: Query> DoExecute<Q> {
-    fn new(
-        reactor: &Arc<Reactor>,
-        query: Q,
-        view_wrapper: ExecutionContext,
-        world_receiver: Receiver<CacheMap>,
-        direct_receiver: Receiver<CacheMap>,
-    ) -> Self {
+    fn new(reactor: &Arc<Reactor>, query: Q, parent_context: Option<ExecutionContext>) -> Self {
         DoExecute {
             reactor: Arc::clone(reactor),
             query_id: query.id(),
-            query_and_view: Some((query, view_wrapper)),
-            world_receiver,
-            direct_receiver,
+            query: Some(query),
+            parent_context,
         }
     }
 }
@@ -284,17 +341,13 @@ where
     )>;
 
     fn poll(mut self: Pin<&mut Self>, cx: &mut WakeContext<'_>) -> Poll<Self::Output> {
-        if let Some((query, view)) = self.as_mut().query_and_view.take() {
+        if let Some(query) = self.as_mut().query.take() {
             let mut entry = self.reactor.current.entry(query.id()).or_default();
             let len = entry.len();
             entry.push(cx.waker().clone());
             if len == 0 {
-                self.reactor.start_processing(
-                    query,
-                    view,
-                    self.world_receiver.clone(),
-                    self.direct_receiver.clone(),
-                );
+                self.reactor
+                    .start_processing(query, self.parent_context.clone());
             }
             Poll::Pending
         } else if let Some(res2) = self.reactor.cache.get(&self.query_id) {
@@ -321,7 +374,6 @@ impl<Q> Unpin for DoExecute<Q> {}
 struct Continuity {
     reactor: Arc<Reactor>,
     fresh_queries: DashSet<QueryId, FxBuildHasher>,
-    world_deps_states: QDashMap<Fingerprint>,
 }
 
 impl Continuity {
@@ -329,17 +381,16 @@ impl Continuity {
         Continuity {
             reactor,
             fresh_queries: DashSet::default(),
-            world_deps_states: DashMap::default(),
         }
     }
 
-    pub fn drive<Q, T>(self, query: Q) -> impl Future<Output = Result<T::Boxed>>
+    pub fn drive<Q, T>(self: Arc<Self>, query: Q) -> impl Future<Output = Result<T::Boxed>>
     where
         Q: Query<Response = T>,
         T: QueryResponse,
     {
         async move {
-            let (_, res) = Arc::new(self).do_execute(query, None).await?;
+            let (_, res) = self.do_execute(query, None).await?;
             Ok(res)
         }
     }
@@ -371,7 +422,7 @@ impl Continuity {
             (*fingerprint, value)
         } else {
             self.reactor
-                .do_execute(query, parent_view, &self)
+                .do_execute(query, parent_view.into().map(|it| ExecutionContext(it)))
                 .await
                 .with_context(|| format!("as a part of {id}"))?
         };
@@ -385,10 +436,11 @@ struct ExecutionView {
     parent: Option<Arc<ExecutionView>>,
     dependents: PerSet<QueryId>,
     continuity: Arc<Continuity>,
-    world_dependencies: Sender<PerMap<QueryId, Fingerprint>>,
-    direct_dependencies: Sender<PerMap<QueryId, Fingerprint>>,
+    world_dependencies: UnboundedSender<PerMap<QueryId, Fingerprint>>,
+    direct_dependencies: UnboundedSender<PerMap<QueryId, Fingerprint>>,
 }
 
+#[derive(Clone)]
 pub struct ExecutionContext(Arc<ExecutionView>);
 
 impl ExecutionView {
@@ -435,8 +487,7 @@ impl ExecutionContext {
                 .map_err(|_| anyhow!("Conflicting params with id {}", param.query_id()))?;
             self.0
                 .world_dependencies
-                .send(PerMap::empty().insert(param.query_id().clone(), *fingerprint))
-                .await?;
+                .unbounded_send(PerMap::empty().insert(param.query_id().clone(), *fingerprint))?;
             Ok(result)
         }
     }
@@ -464,8 +515,7 @@ impl ExecutionContext {
                 .with_context(|| format!("as a part of {id}"))?;
             self.0
                 .direct_dependencies
-                .send(PerMap::empty().insert(id.clone(), fingerprint))
-                .await?;
+                .unbounded_send(PerMap::empty().insert(id.clone(), fingerprint))?;
             Ok(result)
         }
     }

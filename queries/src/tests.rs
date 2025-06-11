@@ -7,7 +7,7 @@ use std::collections::HashSet;
 use std::sync::Arc;
 
 use crate::execution::ExecutionContext;
-use crate::{Executor, Query, QueryId, data::Param, execution::Reactor};
+use crate::{data::Param, execution::Reactor, Executor, Query, QueryId};
 
 static INPUT: Param<Vec<u64>> = Param::new("input");
 
@@ -17,6 +17,33 @@ fn configuration() -> ProptestConfig {
         max_shrink_iters: 8 * 1024,
         ..ProptestConfig::default()
     }
+}
+
+#[ntest::timeout(3000)]
+#[test]
+fn queries_are_not_executed_when_no_changes_to_direct_dependencies_() {
+    let mut values = vec![1, 2, 3];
+    let (inc, dec) = (0, 1);
+    let sum: u64 = values.iter().sum::<u64>() * 2;
+
+    // sleep(Duration::from_millis(50));
+    let ctx = Arc::new(Reactor::new());
+    ctx.set_param(&INPUT, values.clone());
+    let result_sum = block_on(ctx.execute(Double));
+    assert_eq!(sum, *result_sum.unwrap());
+
+    values[inc] += 1;
+    values[dec] -= 1;
+    ctx.set_param(&INPUT, values.clone());
+    let result_sum = block_on(ctx.execute(Double));
+    let res = *result_sum.unwrap();
+    assert_eq!(sum, res);
+
+    let doubling_num = block_on(ctx.trace())
+        .iter()
+        .filter(|s| s == &"[Double]")
+        .count();
+    assert_eq!(1, doubling_num);
 }
 
 #[test]

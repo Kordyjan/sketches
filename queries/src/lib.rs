@@ -8,8 +8,8 @@ use std::{any::Any, future::Future};
 
 pub mod data;
 pub mod execution;
-mod fingerprinting;
-mod serialization;
+pub mod fingerprinting;
+pub mod serialization;
 
 #[cfg(test)]
 mod tests;
