@@ -1,23 +1,23 @@
 use anyhow::Result;
 use async_std::sync::RwLock;
 use divisors_fixed::Divisors;
-use futures::future::{join_all, TryJoinAll};
-use queries::{data::QueryId, execution::ExecutionContext, Param, Query};
-use rand::{rng, Rng};
-use std::ops::BitXor;
+use futures::future::{TryJoinAll, join_all};
+use queries::{Param, Query, data::QueryId, execution::ExecutionContext};
+use rand::{Rng, rng};
 use std::sync::Arc;
+use std::future::Future;
 
-pub static INPUT: Param<Vec<u64>> = Param::new("input");
+pub static INPUT: Param<Vec<String>> = Param::new("input");
 
 #[derive(Clone, Copy)]
 pub struct NonlockingProcess(pub usize);
 
 impl Query for NonlockingProcess {
-    type Response = u64;
+    type Response = String;
 
     fn body(&self, ctx: &ExecutionContext) -> impl Future<Output = Result<Self::Response>> + Send {
         async {
-            let this = ctx.get_param(&INPUT).await?[self.0];
+            let this = ctx.get_param(&INPUT).await?[self.0].clone();
             let futures = self
                 .0
                 .divisors()
@@ -29,7 +29,7 @@ impl Query for NonlockingProcess {
                 .into_iter()
                 .collect::<Result<Vec<_>>>()?
                 .into_iter()
-                .fold(this, |acc, v| mix(acc, *v));
+                .fold(this, |acc, v| mix(acc, v.as_ref().to_string()));
             Ok(result)
         }
     }
@@ -43,11 +43,11 @@ impl Query for NonlockingProcess {
 pub struct Process(pub usize, pub Arc<RwLock<()>>);
 
 impl Query for Process {
-    type Response = u64;
+    type Response = String;
 
     fn body(&self, ctx: &ExecutionContext) -> impl Future<Output = Result<Self::Response>> + Send {
         async move {
-            let this = ctx.get_param(&INPUT).await?[self.0];
+            let this = ctx.get_param(&INPUT).await?[self.0].clone();
             let divisors = (self.0 + 1).divisors();
             let len = divisors.len();
             if len == 1 {
@@ -70,7 +70,7 @@ impl Query for Process {
                 .collect::<TryJoinAll<_>>()
                 .await?
                 .into_iter()
-                .fold(this, |acc, v| mix(acc, *v));
+                .fold(this, |acc, v| mix(acc, v.as_ref().to_string()));
             Ok(res)
         }
     }
@@ -80,6 +80,6 @@ impl Query for Process {
     }
 }
 
-pub fn mix(a: u64, b: u64) -> u64 {
-    a.rotate_left(1).bitxor(b)
+pub fn mix(a: String, b: String) -> String {
+    a + &b
 }

@@ -1,5 +1,5 @@
 use anyhow::{Context, Result, bail};
-
+use std::mem::size_of;
 use crate::serialization::{Reader, Writer};
 
 use super::{Object, ReadObject};
@@ -63,5 +63,24 @@ impl<T: ReadObject> ReadObject for Vec<T> {
             res.push(reader.read_object().context("Reading vec contents")?);
         }
         Ok(res)
+    }
+}
+
+impl Object for String {
+    fn write(&self, writer: &mut dyn Writer) {
+        let bytes = self.as_bytes();
+        writer.write_object(&(bytes.len() as u64));
+        writer.write(bytes);
+    }
+}
+
+impl ReadObject for String {
+    fn read(reader: &mut impl Reader) -> Result<Self>
+    where
+        Self: Sized,
+    {
+        let len = reader.read_object::<u64>().context("Reading string length")? as usize;
+        let bytes = reader.read(len);
+        String::from_utf8(bytes.to_vec()).context("Converting bytes to UTF-8 string")
     }
 }

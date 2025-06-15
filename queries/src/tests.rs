@@ -7,7 +7,7 @@ use std::collections::HashSet;
 use std::sync::Arc;
 
 use crate::execution::ExecutionContext;
-use crate::{data::Param, execution::Reactor, Executor, Query, QueryId};
+use crate::{Executor, Query, QueryId, data::Param, execution::Reactor};
 
 static INPUT: Param<Vec<u64>> = Param::new("input");
 

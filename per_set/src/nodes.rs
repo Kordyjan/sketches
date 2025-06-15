@@ -10,7 +10,11 @@ use sparse_vec::SparseVec;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum MergeError<K, V> {
-    ValueConflict { key: K, left_value: V, right_value: V },
+    ValueConflict {
+        key: K,
+        left_value: V,
+        right_value: V,
+    },
 }
 
 pub enum Node<K, V> {

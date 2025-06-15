@@ -4,20 +4,17 @@ use async_std::sync::RwLock;
 use divisors_fixed::Divisors;
 use futures::future::TryJoinAll;
 use itertools::Itertools;
-use queries::execution::Reactor;
-use queries::fingerprinting::stamp_with_fingerprint;
-use queries::Executor;
+use queries::{execution::Reactor, Executor};
 use rand::{distr, Rng};
 use rustc_hash::FxHashMap;
-use std::collections::HashMap;
-use std::iter;
-use std::sync::Arc;
+use std::{collections::HashMap, iter, sync::Arc};
 
 pub(crate) mod query;
 
 #[allow(dead_code)]
 async fn immutable_scenario(rng: &mut impl Rng, input_size: usize, process_count: usize) {
-    let input: Vec<u64> = iter::repeat_with(|| rng.random::<u64>())
+    let input: Vec<String> = iter::repeat_with(|| ((rng.random::<u8>() % 26) + b'a') as char)
+        .map(|c| c.to_string())
         .take(input_size)
         .collect();
     let reactor = Arc::new(Reactor::new());
@@ -42,7 +39,8 @@ async fn mutable_scenario(
     modification_count: usize,
     max_weight: usize,
 ) {
-    let mut input: Vec<u64> = iter::repeat_with(|| rng.random::<u64>())
+    let mut input: Vec<String> = iter::repeat_with(|| ((rng.random::<u8>() % 26) + b'a') as char)
+        .map(|c| c.to_string())
         .take(input_size)
         .collect();
 
@@ -60,7 +58,8 @@ async fn mutable_scenario(
 
     let modifications = iter::repeat_with(|| {
         let n = rng.sample(distr::Uniform::new(0, input_size).unwrap());
-        Op::Replace(n, rng.random())
+        let c = ((rng.random::<u8>() % 26) + b'a') as char;
+        Op::Replace(n, c.to_string())
     })
     .take(modification_count)
     .collect::<Vec<_>>();
@@ -77,7 +76,6 @@ async fn mutable_scenario(
     let lock = Arc::new(RwLock::new(()));
     let reactor = Arc::new(Reactor::new());
     reactor.set_param(&INPUT, input.clone());
-    // reactor.set_param(&LOCK, Lock(Arc::clone(&lock)));
 
     for Step {
         updates,
@@ -112,9 +110,6 @@ async fn mutable_scenario(
         }
         reactor.set_param(&INPUT, input.clone());
 
-        let (old_hash, _) = stamp_with_fingerprint(Arc::new(old_input.clone()));
-        let (new_hash, _) = stamp_with_fingerprint(Arc::new(input.clone()));
-
         let mut cache = FxHashMap::default();
         let mut old_cache = FxHashMap::default();
         let expectations = processes
@@ -129,18 +124,17 @@ async fn mutable_scenario(
             .collect::<Vec<_>>();
 
         drop(guard);
-        let results = process_task
-            .await
-            .unwrap()
-            .into_iter()
-            .map(|a| *a)
-            .collect::<Vec<_>>();
+        let results = process_task.await.unwrap().into_iter().collect::<Vec<_>>();
 
-        println!("old: {old_hash:?} new: {new_hash:?}");
+        println!("│{}│", (0..10).join(""));
+        println!("│{}│", old_input.join(""));
+        println!("│{}│\n", input.join(""));
+
         for ((n, exp1, exp2), result) in expectations.into_iter().zip(results) {
-            println!("checking {n} ");
-            assert!(result == exp1 || result == exp2);
+            println!("{n}: ( {exp1} | {exp2} ) {result}");
+            assert!(result == Arc::new(exp1) || result == Arc::new(exp2));
         }
+        println!();
     }
 }
 
@@ -151,7 +145,7 @@ fn calc_steps(groups: &HashMap<usize, Vec<Op>>) -> Vec<Step> {
         let updates = group
             .iter()
             .filter_map(|op| match op {
-                Op::Replace(n, v) => Some((*n, *v)),
+                Op::Replace(n, v) => Some((*n, v.clone())),
                 _ => None,
             })
             .collect();
@@ -178,8 +172,8 @@ fn calc_steps(groups: &HashMap<usize, Vec<Op>>) -> Vec<Step> {
     steps
 }
 
-fn check(n: usize, input: &[u64], cache: &mut FxHashMap<usize, u64>) -> u64 {
-    let this = input[n];
+fn check(n: usize, input: &[String], cache: &mut FxHashMap<usize, String>) -> String {
+    let this = input[n].clone();
     let divisors = (n + 1).divisors();
     let len = divisors.len();
     if len == 1 {
@@ -190,10 +184,10 @@ fn check(n: usize, input: &[u64], cache: &mut FxHashMap<usize, u64>) -> u64 {
         .map(|m| {
             let m = *m - 1;
             if let Some(v) = cache.get(&m) {
-                *v
+                v.clone()
             } else {
                 let v = check(m, input, cache);
-                cache.insert(m, v);
+                cache.insert(m, v.clone());
                 v
             }
         })
@@ -201,13 +195,13 @@ fn check(n: usize, input: &[u64], cache: &mut FxHashMap<usize, u64>) -> u64 {
 }
 
 struct Step {
-    updates: Vec<(usize, u64)>,
+    updates: Vec<(usize, String)>,
     processes: Vec<usize>,
     nonlocking_processes: Vec<usize>,
 }
 
 enum Op {
-    Replace(usize, u64),
+    Replace(usize, String),
     Calculate(usize),
     CalculateNonlocking(usize),
 }

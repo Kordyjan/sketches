@@ -31,7 +31,6 @@ proptest! {
 
     #[test]
     fn values_are_retrieved(elems in hash_map(0u64..1024, "\\w{1,7}", 0usize..16)) {
-        println!("\n\n\n\n");
         let map = PerMap::<u64, String>::empty();
         let map = elems.iter().fold(map, |m, (k, v)| m.insert(*k, v.clone()));
 

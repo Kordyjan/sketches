@@ -16,7 +16,6 @@ use futures::{
 use per_set::{PerMap, PerSet};
 use rustc_hash::FxBuildHasher;
 use smallvec::SmallVec;
-use std::fmt::Write;
 use std::{
     iter,
     pin::Pin,
@@ -30,6 +29,7 @@ struct Cached {
     result: Result<(Fingerprint, Arc<dyn Object>)>,
     world_state: CacheMap,
     deps_state: CacheMap,
+    direct_world_state: CacheMap,
 }
 
 type QDashMap<V> = DashMap<QueryId, V, FxBuildHasher>;
@@ -50,6 +50,7 @@ impl Default for Reactor {
 }
 
 impl Reactor {
+    #[must_use]
     pub fn new() -> Self {
         let (trace_sender, trace_receiver) = mpsc::unbounded();
         Reactor {
@@ -89,6 +90,7 @@ impl Reactor {
 
             let cache_correct = match reactor.cache.get(&id) {
                 Some(cached) if reactor.verify(&cached.world_state) => true,
+                Some(cached) if !reactor.verify(&cached.direct_world_state) => false,
                 Some(cached) => {
                     let deps_state = cached.deps_state.clone();
                     drop(cached);
@@ -98,7 +100,7 @@ impl Reactor {
             };
 
             if !cache_correct {
-                let (result, world_dependencies, direct_dependencies) = loop {
+                let cached = loop {
                     if let Some(res) = reactor
                         .run_body_once(query.clone(), parent_context.clone())
                         .await
@@ -110,18 +112,10 @@ impl Reactor {
                 if let Some(ExecutionContext(parent)) = parent_context {
                     let _ = parent
                         .world_dependencies
-                        .unbounded_send(world_dependencies.clone());
+                        .unbounded_send(cached.world_state.clone());
                 }
 
-                let obj = result.map(|v| stamp_with_fingerprint(v.into_object()));
-                reactor.cache.insert(
-                    query.id().clone(),
-                    Cached {
-                        result: obj,
-                        world_state: world_dependencies,
-                        deps_state: direct_dependencies,
-                    },
-                );
+                reactor.cache.insert(query.id().clone(), cached);
                 reactor
                     .trace_sender
                     .unbounded_send(id.to_string())
@@ -149,38 +143,42 @@ impl Reactor {
         handle.detach();
     }
 
-    async fn run_body_once<T>(
+    async fn run_body_once<T: QueryResponse>(
         self: &Arc<Self>,
         query: impl Query<Response = T>,
         parent_context: Option<ExecutionContext>,
-    ) -> Option<(Result<T>, CacheMap, CacheMap)> {
+    ) -> Option<Cached> {
         self.cache.remove(&query.id());
         let (world_sender, mut world_receiver) = mpsc::unbounded();
-        let (direct_sender, mut direct_receiver) = mpsc::unbounded();
+        let (direct_world_sender, mut direct_world_receiver) = mpsc::unbounded();
+        let (deps_sender, mut deps_receiver) = mpsc::unbounded();
 
         let dependents = parent_context
             .as_ref()
             .map(|it| it.0.dependents.clone())
             .unwrap_or_default()
             .insert(query.id().clone());
-        let continuity = parent_context
-            .as_ref()
-            .map(|it| it.0.continuity.clone())
-            .unwrap_or_else(|| self.new_continuity().clone());
+        let continuity = parent_context.as_ref().map_or_else(
+            || self.new_continuity().clone(),
+            |it| it.0.continuity.clone(),
+        );
         let context = ExecutionContext(Arc::new(ExecutionView {
             current: query.id().clone(),
             parent: parent_context.map(|it| it.0),
             dependents,
             continuity,
             world_dependencies: world_sender,
-            direct_dependencies: direct_sender,
+            direct_dependencies: deps_sender,
+            direct_world_dependencies: direct_world_sender,
         }));
 
         let result = query.body(&context).await;
         context.0.world_dependencies.close_channel();
         context.0.direct_dependencies.close_channel();
+        context.0.direct_world_dependencies.close_channel();
 
         let mut world_dependencies = CacheMap::empty();
+        let mut direct_world_dependencies = CacheMap::empty();
         let mut direct_dependencies = CacheMap::empty();
 
         let deps_unique = loop {
@@ -192,23 +190,37 @@ impl Reactor {
             };
             world_dependencies = sum;
         } && loop {
-            let Some(dep) = direct_receiver.next().await else {
+            let Some(dep) = deps_receiver.next().await else {
                 break true;
             };
             let Ok(sum) = direct_dependencies.non_overriding_union(&dep) else {
                 break false;
             };
             direct_dependencies = sum;
+        } && loop {
+            let Some(dep) = direct_world_receiver.next().await else {
+                break true;
+            };
+            let Ok(sum) = direct_world_dependencies.non_overriding_union(&dep) else {
+                break false;
+            };
+            direct_world_dependencies = sum;
         };
 
-        deps_unique.then(|| (result, world_dependencies, direct_dependencies))
+        deps_unique.then(|| Cached {
+            result: result.map(|it| stamp_with_fingerprint(it.into_object())),
+            world_state: world_dependencies,
+            deps_state: direct_dependencies,
+            direct_world_state: direct_world_dependencies,
+        })
     }
 
     async fn recheck(reactor: &Arc<Reactor>, id: &QueryId, deps_state: CacheMap) -> bool {
         if deps_state.is_empty() {
             false
         } else {
-            let (local_sender, mut local_receiver) = mpsc::unbounded::<CacheMap>();
+            let (world_sender, mut world_receiver) = mpsc::unbounded::<CacheMap>();
+            let (direct_world_sender, mut direct_world_receiver) = mpsc::unbounded::<CacheMap>();
             let iter = deps_state.iter().map(|state| async {
                 let Some(query) = reactor.past_queries.get(&state.0) else {
                     return false;
@@ -218,14 +230,25 @@ impl Reactor {
                 drop(query);
                 let result = reactor.do_execute(q, None).await;
 
-                let res = matches!(result, Ok((f, _)) if f == state.1);
+                let res = if let Ok((f, _)) = result {
+                    f == state.1
+                } else {
+                    false
+                };
                 if res {
                     let world_ref = reactor.cache.get(&id).unwrap().world_state.clone();
                     let world = world_ref.clone();
+                    let direct_world_ref =
+                        reactor.cache.get(&id).unwrap().direct_world_state.clone();
+                    let direct_world = direct_world_ref.clone();
                     drop(world_ref);
-                    if local_sender.unbounded_send(world).is_err() {
+                    drop(direct_world_ref);
+                    if world_sender.unbounded_send(world).is_err() {
                         return false;
                     };
+                    if direct_world_sender.unbounded_send(direct_world).is_err() {
+                        return false;
+                    }
                 }
                 res
             });
@@ -234,19 +257,39 @@ impl Reactor {
             let results = stream.collect::<Vec<_>>().await;
             let res = results.iter().all(|&a| a);
             if res {
-                drop(local_sender);
-                let world_state = CacheMap::empty();
-                while let Some(dep) = local_receiver.next().await {
-                    if world_state.non_overriding_union(&dep).is_err() {
+                drop(world_sender);
+                drop(direct_world_sender);
+
+                let mut world_state = CacheMap::empty();
+                while let Some(dep) = world_receiver.next().await {
+                    if let Ok(new_state) = world_state.non_overriding_union(&dep) {
+                        world_state = new_state;
+                    } else {
                         return false;
                     }
                 }
 
-                reactor
-                    .cache
-                    .entry(id.clone())
-                    .and_modify(move |c| c.world_state = world_state);
+                let mut direct_world_state = CacheMap::empty();
+                while let Some(dep) = direct_world_receiver.next().await {
+                    if let Ok(new_state) = direct_world_state.non_overriding_union(&dep) {
+                        direct_world_state = new_state;
+                    } else {
+                        return false;
+                    }
+                }
+
+                reactor.cache.entry(id.clone()).and_modify(move |c| {
+                    c.world_state = world_state;
+                    c.direct_world_state = direct_world_state;
+                });
             }
+            let val = reactor.cache.get(&id).unwrap();
+            println!(
+                "Recheck for {}: {} ({:?})",
+                id,
+                res,
+                val.result.as_ref().unwrap()
+            );
             res
         }
     }
@@ -290,12 +333,6 @@ impl Executor for Arc<Reactor> {
                     .get(&query.id())
                     .context("Cache corrupted")?
                     .world_state;
-                let mut log = String::new();
-                writeln!(log, "<- {id}", id = query.id()).unwrap();
-                for kv in world_state {
-                    writeln!(log, "\t {k} - {v:?}", k = kv.0, v = kv.1).unwrap();
-                }
-                println!("{log}");
                 if self.verify(world_state) {
                     break Ok(res);
                 }
@@ -422,7 +459,7 @@ impl Continuity {
             (*fingerprint, value)
         } else {
             self.reactor
-                .do_execute(query, parent_view.into().map(|it| ExecutionContext(it)))
+                .do_execute(query, parent_view.into().map(ExecutionContext))
                 .await
                 .with_context(|| format!("as a part of {id}"))?
         };
@@ -437,6 +474,7 @@ struct ExecutionView {
     dependents: PerSet<QueryId>,
     continuity: Arc<Continuity>,
     world_dependencies: UnboundedSender<PerMap<QueryId, Fingerprint>>,
+    direct_world_dependencies: UnboundedSender<PerMap<QueryId, Fingerprint>>,
     direct_dependencies: UnboundedSender<PerMap<QueryId, Fingerprint>>,
 }
 
@@ -487,6 +525,9 @@ impl ExecutionContext {
                 .map_err(|_| anyhow!("Conflicting params with id {}", param.query_id()))?;
             self.0
                 .world_dependencies
+                .unbounded_send(PerMap::empty().insert(param.query_id().clone(), *fingerprint))?;
+            self.0
+                .direct_world_dependencies
                 .unbounded_send(PerMap::empty().insert(param.query_id().clone(), *fingerprint))?;
             Ok(result)
         }
