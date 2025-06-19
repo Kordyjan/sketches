@@ -1,16 +1,17 @@
 use crate::{ErasedQuery, Executor, Query};
-use anyhow::{Context, Result, anyhow, bail};
+use anyhow::{anyhow, bail, Context, Result};
+use cache::cache::{Cache, Cached};
 use cache::data::{ErasedResponse, QueryResponse};
 use cache::data::{Object, Param};
-use cache::fingerprinting::{Fingerprint, stamp_with_fingerprint};
+use cache::fingerprinting::{stamp_with_fingerprint, Fingerprint};
 use cache::{QDashMap, QueryId};
 use dashmap::DashSet;
 use futures::channel::mpsc::{UnboundedReceiver, UnboundedSender};
 use futures::{
-    FutureExt, StreamExt, TryStream, TryStreamExt,
-    channel::mpsc::{self},
-    lock::Mutex,
-    stream::FuturesUnordered,
+    channel::mpsc::{self}, lock::Mutex, stream::FuturesUnordered,
+    FutureExt,
+    StreamExt,
+    TryStreamExt,
 };
 use per_set::{PerMap, PerSet};
 use rustc_hash::FxBuildHasher;
@@ -24,18 +25,11 @@ use std::{
 
 type CacheMap = PerMap<QueryId, Fingerprint>;
 
-struct Cached {
-    result: Result<(Fingerprint, Arc<dyn Object>)>,
-    world_state: CacheMap,
-    deps_state: CacheMap,
-    direct_world_state: CacheMap,
-}
-
 pub struct Reactor {
     params: QDashMap<(Fingerprint, Arc<dyn Object>)>,
     trace: Mutex<(Vec<String>, UnboundedReceiver<String>)>,
     trace_sender: UnboundedSender<String>,
-    cache: QDashMap<Cached>,
+    cache: Box<dyn Cache + Sync + Send + 'static>,
     current: QDashMap<SmallVec<[Waker; 4]>>,
     past_queries: QDashMap<ErasedQuery>,
 }
@@ -54,7 +48,19 @@ impl Reactor {
             params: QDashMap::default(),
             trace: Mutex::new((Vec::new(), trace_receiver)),
             trace_sender,
-            cache: QDashMap::default(),
+            cache: Box::new(QDashMap::default()),
+            current: QDashMap::default(),
+            past_queries: QDashMap::default(),
+        }
+    }
+
+    pub fn with_cache<T: Cache + Sync + Send + 'static>(cache: T) -> Self {
+        let (trace_sender, trace_receiver) = mpsc::unbounded();
+        Reactor {
+            params: QDashMap::default(),
+            trace: Mutex::new((Vec::new(), trace_receiver)),
+            trace_sender,
+            cache: Box::new(cache),
             current: QDashMap::default(),
             past_queries: QDashMap::default(),
         }
@@ -85,7 +91,7 @@ impl Reactor {
         let handle = async_global_executor::spawn(async move {
             let id = query.id();
 
-            let cache_correct = match reactor.cache.get(&id) {
+            let cache_correct = match reactor.cache.pull(&id) {
                 Some(cached) if reactor.verify(&cached.world_state) => true,
                 Some(cached) if !reactor.verify(&cached.direct_world_state) => false,
                 Some(cached) => {
@@ -112,7 +118,7 @@ impl Reactor {
                         .unbounded_send(cached.world_state.clone());
                 }
 
-                reactor.cache.insert(query.id().clone(), cached);
+                reactor.cache.push(query.id().clone(), cached);
                 reactor
                     .trace_sender
                     .unbounded_send(id.to_string())
@@ -233,10 +239,10 @@ impl Reactor {
                     false
                 };
                 if res {
-                    let world_ref = reactor.cache.get(&id).unwrap().world_state.clone();
+                    let world_ref = reactor.cache.pull(&id).unwrap().world_state.clone();
                     let world = world_ref.clone();
                     let direct_world_ref =
-                        reactor.cache.get(&id).unwrap().direct_world_state.clone();
+                        reactor.cache.pull(&id).unwrap().direct_world_state.clone();
                     let direct_world = direct_world_ref.clone();
                     drop(world_ref);
                     drop(direct_world_ref);
@@ -280,7 +286,7 @@ impl Reactor {
                     c.direct_world_state = direct_world_state;
                 });
             }
-            let val = reactor.cache.get(&id).unwrap();
+            let val = reactor.cache.pull(&id).unwrap();
             println!(
                 "Recheck for {}: {} ({:?})",
                 id,
@@ -327,7 +333,7 @@ impl Executor for Arc<Reactor> {
                 let res = Arc::clone(&continuity).drive(query.clone()).await?;
                 let world_state = &self
                     .cache
-                    .get(&query.id())
+                    .pull(&query.id())
                     .context("Cache corrupted")?
                     .world_state;
                 if self.verify(world_state) {
@@ -384,7 +390,7 @@ where
                     .start_processing(query, self.parent_context.clone());
             }
             Poll::Pending
-        } else if let Some(res2) = self.reactor.cache.get(&self.query_id) {
+        } else if let Some(res2) = self.reactor.cache.pull(&self.query_id) {
             let res = &res2.result;
             let res = res
                 .as_ref()
@@ -443,7 +449,7 @@ impl Continuity {
             let cached_result = &self
                 .reactor
                 .cache
-                .get(&query.id())
+                .pull(&query.id())
                 .context("Cache was corrupted")?
                 .result;
             let Ok((fingerprint, value)) = cached_result.as_ref() else {
