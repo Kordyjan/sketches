@@ -1,17 +1,16 @@
-use crate::data::{ErasedResponse, QueryResponse};
-use crate::{
-    data::{Object, Param, QueryId}, fingerprinting::{stamp_with_fingerprint, Fingerprint}, ErasedQuery,
-    Executor,
-    Query,
-};
-use anyhow::{anyhow, bail, Context, Result};
-use dashmap::{DashMap, DashSet};
+use crate::{ErasedQuery, Executor, Query};
+use anyhow::{Context, Result, anyhow, bail};
+use cache::data::{ErasedResponse, QueryResponse};
+use cache::data::{Object, Param};
+use cache::fingerprinting::{Fingerprint, stamp_with_fingerprint};
+use cache::{QDashMap, QueryId};
+use dashmap::DashSet;
 use futures::channel::mpsc::{UnboundedReceiver, UnboundedSender};
 use futures::{
-    channel::mpsc::{self}, lock::Mutex, stream::FuturesUnordered, FutureExt,
-    StreamExt,
-    TryStream,
-    TryStreamExt,
+    FutureExt, StreamExt, TryStream, TryStreamExt,
+    channel::mpsc::{self},
+    lock::Mutex,
+    stream::FuturesUnordered,
 };
 use per_set::{PerMap, PerSet};
 use rustc_hash::FxBuildHasher;
@@ -31,8 +30,6 @@ struct Cached {
     deps_state: CacheMap,
     direct_world_state: CacheMap,
 }
-
-type QDashMap<V> = DashMap<QueryId, V, FxBuildHasher>;
 
 pub struct Reactor {
     params: QDashMap<(Fingerprint, Arc<dyn Object>)>,

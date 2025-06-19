@@ -1,13 +1,13 @@
+use crate::execution::ExecutionContext;
+use crate::{Executor, Query, QueryId, execution::Reactor};
 use anyhow::Result;
 use async_global_executor::block_on;
+use cache::data::Param;
 use futures::future::try_join_all;
 use proptest::collection::vec;
 use proptest::prelude::*;
 use std::collections::HashSet;
 use std::sync::Arc;
-
-use crate::execution::ExecutionContext;
-use crate::{Executor, Query, QueryId, data::Param, execution::Reactor};
 
 static INPUT: Param<Vec<u64>> = Param::new("input");
 

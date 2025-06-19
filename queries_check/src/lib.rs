@@ -1,11 +1,11 @@
-use crate::query::{mix, NonlockingProcess, Process, INPUT};
+use crate::query::{INPUT, NonlockingProcess, Process, mix};
 use async_global_executor::spawn;
 use async_std::sync::RwLock;
 use divisors_fixed::Divisors;
 use futures::future::TryJoinAll;
 use itertools::Itertools;
-use queries::{execution::Reactor, Executor};
-use rand::{distr, Rng};
+use queries::{Executor, execution::Reactor};
+use rand::{Rng, distr};
 use rustc_hash::FxHashMap;
 use std::{collections::HashMap, iter, sync::Arc};
 

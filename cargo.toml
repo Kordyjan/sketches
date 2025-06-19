@@ -1,6 +1,6 @@
 [workspace]
 
-members = ["per_set", "playground", "queries", "queries_check", "sparse_vec", "test_utils"]
+members = ["cache", "per_set", "playground", "queries", "queries_check", "sparse_vec", "test_utils"]
 resolver = "2"
 
 [workspace.lints.clippy]

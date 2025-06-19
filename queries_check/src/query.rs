@@ -1,11 +1,12 @@
 use anyhow::Result;
 use async_std::sync::RwLock;
+use cache::QueryId;
 use divisors_fixed::Divisors;
-use futures::future::{TryJoinAll, join_all};
-use queries::{Param, Query, data::QueryId, execution::ExecutionContext};
-use rand::{Rng, rng};
-use std::sync::Arc;
+use futures::future::{join_all, TryJoinAll};
+use queries::{execution::ExecutionContext, Param, Query};
+use rand::{rng, Rng};
 use std::future::Future;
+use std::sync::Arc;
 
 pub static INPUT: Param<Vec<String>> = Param::new("input");
 

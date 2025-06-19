@@ -1,7 +1,8 @@
+use crate::QueryId;
 use crate::serialization::{Reader, Writer};
 use anyhow::Result;
 use std::fmt::Debug;
-use std::{any::Any, borrow::Cow, fmt::Display, marker::PhantomData, sync::Arc};
+use std::{any::Any, fmt::Display, marker::PhantomData, sync::Arc};
 
 pub mod instances;
 
@@ -90,26 +91,7 @@ impl<T> Param<T> {
         }
     }
 
-    pub(crate) fn query_id(&self) -> &QueryId {
+    pub fn query_id(&self) -> &QueryId {
         &self.id
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct QueryId(Cow<'static, str>);
-
-impl QueryId {
-    pub const fn new_static(s: &'static str) -> Self {
-        QueryId(Cow::Borrowed(s))
-    }
-
-    pub fn new(s: impl ToOwned<Owned = String>) -> Self {
-        QueryId(Cow::Owned(s.to_owned()))
-    }
-}
-
-impl Display for QueryId {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "[{}]", &*self.0)
     }
 }

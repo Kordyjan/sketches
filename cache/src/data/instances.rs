@@ -1,8 +1,7 @@
+use super::{Object, ReadObject};
+use crate::serialization::{Reader, Writer};
 use anyhow::{Context, Result, bail};
 use std::mem::size_of;
-use crate::serialization::{Reader, Writer};
-
-use super::{Object, ReadObject};
 
 impl Object for u64 {
     fn write(&self, writer: &mut dyn Writer) {
@@ -79,7 +78,9 @@ impl ReadObject for String {
     where
         Self: Sized,
     {
-        let len = reader.read_object::<u64>().context("Reading string length")? as usize;
+        let len = reader
+            .read_object::<u64>()
+            .context("Reading string length")? as usize;
         let bytes = reader.read(len);
         String::from_utf8(bytes.to_vec()).context("Converting bytes to UTF-8 string")
     }

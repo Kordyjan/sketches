@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::Object;
+use crate::data::Object;
 use anyhow::Result;
 
 pub trait Writer {

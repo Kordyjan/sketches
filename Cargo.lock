@@ -194,6 +194,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1fd0f2584146f6f2ef48085050886acf353beff7305ebd1ae69500e27c67f64b"
 
 [[package]]
+name = "cache"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "dashmap",
+ "per_set",
+ "rustc-hash",
+ "rustc-stable-hash",
+]
+
+[[package]]
 name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -707,13 +718,13 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-global-executor 2.4.1",
+ "cache",
  "dashmap",
  "futures",
  "ntest",
  "per_set",
  "proptest",
  "rustc-hash",
- "rustc-stable-hash",
  "smallvec",
  "trait-variant",
 ]
@@ -725,6 +736,7 @@ dependencies = [
  "anyhow",
  "async-global-executor 3.1.0",
  "async-std",
+ "cache",
  "divisors_fixed",
  "futures",
  "itertools",
@@ -846,9 +858,9 @@ checksum = "583034fd73374156e66797ed8e5b0d5690409c9226b22d87cb7f19821c05d152"
 
 [[package]]
 name = "rustc-stable-hash"
-version = "0.1.0"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e5c9f15eec8235d7cb775ee6f81891db79b98fd54ba1ad8fae565b88ef1ae4e2"
+checksum = "781442f29170c5c93b7185ad559492601acdc71d5bb0706f5868094f45cfcd08"
 
 [[package]]
 name = "rustix"
