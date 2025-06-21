@@ -10,13 +10,14 @@ pub enum Message {
     Pull { key: String },
     Remove { key: String },
     Modify { key: String, entry: CacheEntry },
+    End {}
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CacheEntry {
-    value: String,
-    fingerprint: String,
-    world_state: HashMap<String, String>,
-    deps_state: HashMap<String, String>,
-    direct_world_stet: HashMap<String, String>,
+    pub value: String,
+    pub fingerprint: String,
+    pub world_state: HashMap<String, String>,
+    pub deps_state: HashMap<String, String>,
+    pub direct_world_stet: HashMap<String, String>,
 }

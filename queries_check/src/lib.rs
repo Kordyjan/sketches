@@ -1,13 +1,15 @@
-use crate::query::{INPUT, NonlockingProcess, Process, mix};
+use crate::query::{mix, NonlockingProcess, Process, INPUT};
 use async_global_executor::spawn;
 use async_std::sync::RwLock;
 use divisors_fixed::Divisors;
 use futures::future::TryJoinAll;
+use futures::SinkExt;
 use itertools::Itertools;
-use queries::{Executor, execution::Reactor};
-use rand::{Rng, distr};
+use queries::{execution::Reactor, Executor};
+use rand::{distr, Rng};
 use rustc_hash::FxHashMap;
 use std::{collections::HashMap, iter, sync::Arc};
+use tracer_types::Message;
 
 pub(crate) mod query;
 
@@ -73,8 +75,11 @@ async fn mutable_scenario(
 
     let steps = calc_steps(&groups);
 
+    let (output, cache, sender) = tracer::create_cache("../tmp/trace.json").unwrap();
+
     let lock = Arc::new(RwLock::new(()));
-    let reactor = Arc::new(Reactor::new());
+    spawn(output.run()).detach();
+    let reactor = Arc::new(Reactor::with_cache(cache));
     reactor.set_param(&INPUT, input.clone());
 
     for Step {
@@ -90,7 +95,13 @@ async fn mutable_scenario(
             .map(|n| {
                 let reactor = Arc::clone(&reactor);
                 let lock = Arc::clone(&lock);
-                async move { reactor.execute(Process(n, lock)).await }
+                let mut sender = sender.clone();
+                async move {
+                    let _ = sender.unbounded_send(Message::Comment {
+                        content: format!("Process {} started", n),
+                    });
+                    reactor.execute(Process(n, lock)).await
+                }
             })
             .collect::<TryJoinAll<_>>();
         let nonlocking_processes = nonlocking_processes
@@ -108,6 +119,9 @@ async fn mutable_scenario(
         for (n, v) in updates {
             input[n] = v;
         }
+        let _ = sender.unbounded_send(Message::NewChapter {
+            desc: format!("Input changed to {input:?}"),
+        });
         reactor.set_param(&INPUT, input.clone());
 
         let mut cache = FxHashMap::default();

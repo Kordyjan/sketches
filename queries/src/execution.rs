@@ -1,17 +1,17 @@
 use crate::{ErasedQuery, Executor, Query};
-use anyhow::{anyhow, bail, Context, Result};
-use cache::cache::{Cache, Cached};
-use cache::data::{ErasedResponse, QueryResponse};
-use cache::data::{Object, Param};
-use cache::fingerprinting::{stamp_with_fingerprint, Fingerprint};
-use cache::{QDashMap, QueryId};
+use anyhow::{Context, Result, anyhow, bail};
+use cache::{
+    QDashMap, QueryId,
+    cache::{Cache, Cached},
+    data::{ErasedResponse, Object, Param, QueryResponse},
+    fingerprinting::{Fingerprint, stamp_with_fingerprint},
+};
 use dashmap::DashSet;
-use futures::channel::mpsc::{UnboundedReceiver, UnboundedSender};
 use futures::{
-    channel::mpsc::{self}, lock::Mutex, stream::FuturesUnordered,
-    FutureExt,
-    StreamExt,
-    TryStreamExt,
+    FutureExt, StreamExt,
+    channel::mpsc::{self, UnboundedReceiver, UnboundedSender},
+    lock::Mutex,
+    stream::FuturesUnordered,
 };
 use per_set::{PerMap, PerSet};
 use rustc_hash::FxBuildHasher;
@@ -281,10 +281,13 @@ impl Reactor {
                     }
                 }
 
-                reactor.cache.entry(id.clone()).and_modify(move |c| {
-                    c.world_state = world_state;
-                    c.direct_world_state = direct_world_state;
-                });
+                reactor.cache.modify(
+                    id.clone(),
+                    Box::new(move |c| {
+                        c.world_state = world_state;
+                        c.direct_world_state = direct_world_state;
+                    }),
+                );
             }
             let val = reactor.cache.pull(&id).unwrap();
             println!(

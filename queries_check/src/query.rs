@@ -2,9 +2,9 @@ use anyhow::Result;
 use async_std::sync::RwLock;
 use cache::QueryId;
 use divisors_fixed::Divisors;
-use futures::future::{join_all, TryJoinAll};
-use queries::{execution::ExecutionContext, Param, Query};
-use rand::{rng, Rng};
+use futures::future::{TryJoinAll, join_all};
+use queries::{Param, Query, execution::ExecutionContext};
+use rand::{Rng, rng};
 use std::future::Future;
 use std::sync::Arc;
 

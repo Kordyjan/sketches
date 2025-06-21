@@ -10,7 +10,7 @@ pub trait Cache {
     fn push(&self, key: QueryId, entry: Cached);
     fn pull(&self, key: &QueryId) -> Option<Ref<QueryId, Cached>>;
     fn remove(&self, key: &QueryId) -> Option<(QueryId, Cached)>;
-    fn entry(&self, key: QueryId) -> Entry<QueryId, Cached>;
+    fn modify(&self, key: QueryId, f: Box<dyn FnOnce(&mut Cached) + '_>) -> Entry<QueryId, Cached>;
 }
 
 impl Cache for QDashMap<Cached> {
@@ -26,8 +26,8 @@ impl Cache for QDashMap<Cached> {
         self.remove(key)
     }
 
-    fn entry(&self, key: QueryId) -> Entry<QueryId, Cached> {
-        self.entry(key)
+    fn modify(&self, key: QueryId, f: Box<dyn FnOnce(&mut Cached) + '_>) -> Entry<QueryId, Cached>{
+        self.entry(key).and_modify(|cached| f(cached))
     }
 }
 
