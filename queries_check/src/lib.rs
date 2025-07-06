@@ -1,6 +1,7 @@
 use crate::query::{mix, NonlockingProcess, Process, INPUT};
 use async_global_executor::spawn;
 use async_std::sync::RwLock;
+use cache::fingerprinting::stamp_with_fingerprint;
 use divisors_fixed::Divisors;
 use futures::future::TryJoinAll;
 use futures::SinkExt;
@@ -119,8 +120,10 @@ async fn mutable_scenario(
         for (n, v) in updates {
             input[n] = v;
         }
+        let (fingerprint, _) = stamp_with_fingerprint(Arc::new(input.clone()));
         let _ = sender.unbounded_send(Message::NewChapter {
-            desc: format!("Input changed to {input:?}"),
+            data: format!("|{}|", input.join("")),
+            fingerprint: format!("{fingerprint:?}"),
         });
         reactor.set_param(&INPUT, input.clone());
 

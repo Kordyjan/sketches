@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 
 use cache::{
-    QDashMap, QueryId,
-    cache::{Cache, Cached},
-    fingerprinting::Fingerprint,
+    cache::{Cache, Cached}, fingerprinting::Fingerprint,
+    QDashMap,
+    QueryId,
 };
-use dashmap::{Entry, mapref::one::Ref};
+use dashmap::{mapref::one::Ref, Entry};
 use futures::channel::mpsc::UnboundedSender;
 use per_set::PerMap;
 use tracer_types::{CacheEntry, Message};
@@ -71,6 +71,6 @@ fn translate(cached: &Cached) -> CacheEntry {
         fingerprint: format!("{:?}", cached.result.as_ref().unwrap().0),
         world_state: transalte_deps(&cached.world_state),
         deps_state: transalte_deps(&cached.deps_state),
-        direct_world_stet: transalte_deps(&cached.direct_world_state),
+        direct_world_state: transalte_deps(&cached.direct_world_state),
     }
 }
