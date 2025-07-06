@@ -185,6 +185,31 @@ proptest! {
         }
     }
 
+    #[test]
+    fn elements_can_be_removed(
+        retained in hash_map(0u64..1024, "\\w{1,7}", 0usize..16),
+        removed in hash_map(1024u64..2048, "\\w{1,7}", 0usize..16),
+    ) {
+        let mut map: PerMap<u64, String> = retained.iter()
+            .chain(removed.iter())
+            .map(|(k, v)| (*k, v.clone()))
+            .collect();
+
+        for (k, _) in &removed {
+            map = map.remove(k);
+        }
+
+        prop_assert_eq!(map.len(), retained.len());
+
+        for (k, v) in &retained {
+            prop_assert_eq!(map.get(k), Some(v));
+        }
+
+        for (k, _) in &removed {
+            prop_assert_eq!(map.get(k), None);
+        }
+    }
+
 }
 
 #[derive(Clone)]

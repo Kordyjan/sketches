@@ -28,6 +28,8 @@ pub enum Node<K, V> {
     },
 }
 
+impl<K, V> Node<K, V> {}
+
 impl<K, V> Node<K, V> {
     pub fn empty_branch() -> Self {
         Node::Branch {
@@ -186,6 +188,49 @@ impl<K: Eq, V> Node<K, V> {
                 let (new_address, index) = address.shift().unwrap();
                 data.get(index as usize)
                     .and_then(|node| node.get(key, new_address))
+            }
+        }
+    }
+
+    pub(crate) fn remove(node: &Arc<Node<K, V>>, key: &K, address: BitShifter) -> Arc<Node<K, V>>
+    where
+        K: Eq + Hash,
+    {
+        match &**node {
+            Node::Leaf { data, weight } => {
+                if let Some(index) =
+                    data.iter()
+                        .enumerate()
+                        .find_map(|(n, a)| if a.0 == *key { Some(n) } else { None })
+                {
+                    let mut new_data: SmallVec<_> = data.clone();
+                    new_data.remove(index);
+                    Arc::new(Node::Leaf {
+                        data: new_data,
+                        weight: weight - 1,
+                    })
+                } else {
+                    Arc::clone(node)
+                }
+            }
+            Node::Branch { data, weight } => {
+                let (new_address, index) = address.shift().unwrap();
+                match data.get(index as usize) {
+                    None => Arc::clone(node),
+                    Some(child) => {
+                        let new_child = Self::remove(child, key, new_address);
+                        if Arc::ptr_eq(&new_child, child) {
+                            Arc::clone(node)
+                        } else {
+                            let mut new_data = data.clone();
+                            new_data.insert(index as usize, new_child);
+                            Arc::new(Node::Branch {
+                                data: new_data,
+                                weight: weight - 1,
+                            })
+                        }
+                    }
+                }
             }
         }
     }

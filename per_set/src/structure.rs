@@ -83,6 +83,16 @@ where
             hasher: self.hasher.clone(),
         }
     }
+
+    #[must_use]
+    pub fn remove(&self, key: &K) -> Self {
+        let hash = self.hasher.hash_one(&key);
+        let address = BitShifter::new(hash);
+        PerMap {
+            data: Node::remove(&self.data, key, address),
+            hasher: self.hasher.clone(),
+        }
+    }
 }
 
 impl<K, V, S> PerMap<K, V, S>
