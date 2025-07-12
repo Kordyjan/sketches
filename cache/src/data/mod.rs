@@ -1,8 +1,8 @@
-use crate::QueryId;
 use crate::serialization::{Reader, Writer};
+use crate::QueryId;
 use anyhow::Result;
 use std::fmt::Debug;
-use std::{any::Any, fmt::Display, marker::PhantomData, sync::Arc};
+use std::{any::Any, marker::PhantomData, sync::Arc};
 
 pub mod instances;
 
@@ -91,6 +91,7 @@ impl<T> Param<T> {
         }
     }
 
+    #[must_use]
     pub fn query_id(&self) -> &QueryId {
         &self.id
     }

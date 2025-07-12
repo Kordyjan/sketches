@@ -4,7 +4,6 @@ use async_std::sync::RwLock;
 use cache::fingerprinting::stamp_with_fingerprint;
 use divisors_fixed::Divisors;
 use futures::future::TryJoinAll;
-use futures::SinkExt;
 use itertools::Itertools;
 use queries::{execution::Reactor, Executor};
 use rand::{distr, Rng};
@@ -96,10 +95,10 @@ async fn mutable_scenario(
             .map(|n| {
                 let reactor = Arc::clone(&reactor);
                 let lock = Arc::clone(&lock);
-                let mut sender = sender.clone();
+                let sender = sender.clone();
                 async move {
                     let _ = sender.unbounded_send(Message::Comment {
-                        content: format!("Process {} started", n),
+                        content: format!("Process {n} started"),
                     });
                     reactor.execute(Process(n, lock)).await
                 }
@@ -208,7 +207,7 @@ fn check(n: usize, input: &[String], cache: &mut FxHashMap<usize, String>) -> St
                 v
             }
         })
-        .fold(this, mix)
+        .fold(this, |acc, it| mix(acc, &it))
 }
 
 struct Step {

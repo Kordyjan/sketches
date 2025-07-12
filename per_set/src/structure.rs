@@ -86,7 +86,7 @@ where
 
     #[must_use]
     pub fn remove(&self, key: &K) -> Self {
-        let hash = self.hasher.hash_one(&key);
+        let hash = self.hasher.hash_one(key);
         let address = BitShifter::new(hash);
         PerMap {
             data: Node::remove(&self.data, key, address),

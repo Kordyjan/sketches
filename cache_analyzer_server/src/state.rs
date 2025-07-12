@@ -183,14 +183,14 @@ impl ChaptersState {
 
         self.chapters[chapter]
             .iter()
-            .filter_map(|(message, _)| match message {
-                Message::NewChapter { .. } => Some(("NewChapter".to_string(), true)),
-                Message::Pull { key } => Some((format!("Pull {key}"), false)),
-                Message::Push { key, .. } => Some((format!("Push {key}"), false)),
-                Message::Modify { key, .. } => Some((format!("Modify {key}"), false)),
-                Message::Remove { key } => Some((format!("Remove {key}"), false)),
-                Message::Comment { content } => Some((content.clone(), true)),
-                _ => None, // Skip End messages
+            .map(|(message, _)| match message {
+                Message::NewChapter { .. } => ("NewChapter".to_string(), true),
+                Message::Pull { key } => (format!("Pull {key}"), false),
+                Message::Push { key, .. } => (format!("Push {key}"), false),
+                Message::Modify { key, .. } => (format!("Modify {key}"), false),
+                Message::Remove { key } => (format!("Remove {key}"), false),
+                Message::Comment { content } => (content.clone(), true),
+                Message::End {} => ("End".to_string(), true),
             })
             .enumerate()
             .map(|(id, (desc, is_comment))| OpHead {

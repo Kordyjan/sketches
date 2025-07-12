@@ -1,17 +1,17 @@
 use crate::{ErasedQuery, Executor, Query};
-use anyhow::{Context, Result, anyhow, bail};
+use anyhow::{anyhow, bail, Context, Result};
 use cache::{
-    QDashMap, QueryId,
-    cache::{Cache, Cached},
-    data::{ErasedResponse, Object, Param, QueryResponse},
-    fingerprinting::{Fingerprint, stamp_with_fingerprint},
+    cache::{Cache, Cached}, data::{ErasedResponse, Object, Param, QueryResponse},
+    fingerprinting::{stamp_with_fingerprint, Fingerprint},
+    QDashMap,
+    QueryId,
 };
 use dashmap::DashSet;
 use futures::{
-    FutureExt, StreamExt,
-    channel::mpsc::{self, UnboundedReceiver, UnboundedSender},
-    lock::Mutex,
+    channel::mpsc::{self, UnboundedReceiver, UnboundedSender}, lock::Mutex,
     stream::FuturesUnordered,
+    FutureExt,
+    StreamExt,
 };
 use per_set::{PerMap, PerSet};
 use rustc_hash::FxBuildHasher;
@@ -248,7 +248,7 @@ impl Reactor {
                     drop(direct_world_ref);
                     if world_sender.unbounded_send(world).is_err() {
                         return false;
-                    };
+                    }
                     if direct_world_sender.unbounded_send(direct_world).is_err() {
                         return false;
                     }
@@ -289,7 +289,7 @@ impl Reactor {
                     }),
                 );
             }
-            let val = reactor.cache.pull(&id).unwrap();
+            let val = reactor.cache.pull(id).unwrap();
             println!(
                 "Recheck for {}: {} ({:?})",
                 id,

@@ -2,9 +2,9 @@ use anyhow::Result;
 use async_std::sync::RwLock;
 use cache::QueryId;
 use divisors_fixed::Divisors;
-use futures::future::{TryJoinAll, join_all};
-use queries::{Param, Query, execution::ExecutionContext};
-use rand::{Rng, rng};
+use futures::future::{join_all, TryJoinAll};
+use queries::{execution::ExecutionContext, Param, Query};
+use rand::{rng, Rng};
 use std::future::Future;
 use std::sync::Arc;
 
@@ -30,7 +30,7 @@ impl Query for NonlockingProcess {
                 .into_iter()
                 .collect::<Result<Vec<_>>>()?
                 .into_iter()
-                .fold(this, |acc, v| mix(acc, v.as_ref().to_string()));
+                .fold(this, |acc, v| mix(acc, v.as_ref()));
             Ok(result)
         }
     }
@@ -71,7 +71,7 @@ impl Query for Process {
                 .collect::<TryJoinAll<_>>()
                 .await?
                 .into_iter()
-                .fold(this, |acc, v| mix(acc, v.as_ref().to_string()));
+                .fold(this, |acc, v| mix(acc, v.as_ref()));
             Ok(res)
         }
     }
@@ -81,6 +81,6 @@ impl Query for Process {
     }
 }
 
-pub fn mix(a: String, b: String) -> String {
-    a + &b
+pub fn mix(a: String, b: &str) -> String {
+    a + b
 }

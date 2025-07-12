@@ -12,6 +12,7 @@ pub mod serialization;
 pub struct QueryId(Cow<'static, str>);
 
 impl QueryId {
+    #[must_use]
     pub const fn new_static(s: &'static str) -> Self {
         QueryId(Cow::Borrowed(s))
     }
