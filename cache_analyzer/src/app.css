@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@source inline("row-span-2");
+@source inline("row-span-3");
+@source inline("row-span-4");
+@source inline("row-span-5");
+@source inline("row-span-6");
+@source inline("row-span-7");
+@source inline("row-span-8");

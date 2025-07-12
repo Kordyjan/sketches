@@ -1,0 +1,1174 @@
+{"NewChapter":{"data":"|syoclfdijs|","fingerprint":"41a1~545e"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Comment":{"content":"Process 8 started"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Comment":{"content":"Process 5 started"}}
+{"Remove":{"key":"[Process(4)]"}}
+{"Comment":{"content":"Process 5 started"}}
+{"Comment":{"content":"Process 2 started"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Remove":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Comment":{"content":"Process 3 started"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Remove":{"key":"[Process(8)]"}}
+{"Remove":{"key":"[Process(5)]"}}
+{"Remove":{"key":"[Process(2)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Remove":{"key":"[Process(7)]"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Remove":{"key":"[Process(3)]"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Remove":{"key":"[Process(9)]"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Comment":{"content":"Process 2 started"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Remove":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Remove":{"key":"[Process(1)]"}}
+{"Comment":{"content":"Process 3 started"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Comment":{"content":"Process 3 started"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Comment":{"content":"Process 3 started"}}
+{"Comment":{"content":"Process 3 started"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Push":{"key":"[Process(0)]","entry":{"value":"\"s\"","fingerprint":"9e62~7b9e","world_state":{"[input]":"41a1~545e"},"deps_state":{},"direct_world_state":{"[input]":"41a1~545e"}}}}
+{"Comment":{"content":"Process 0 started"}}
+{"Comment":{"content":"Process 2 started"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 8 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 3 started"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Comment":{"content":"Process 2 started"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 3 started"}}
+{"Push":{"key":"[Process(4)]","entry":{"value":"\"ls\"","fingerprint":"ce52~d2da","world_state":{"[input]":"41a1~545e"},"deps_state":{"[Process(0)]":"9e62~7b9e"},"direct_world_state":{"[input]":"41a1~545e"}}}}
+{"Comment":{"content":"Process 0 started"}}
+{"Push":{"key":"[Process(1)]","entry":{"value":"\"ys\"","fingerprint":"11b9~de2e","world_state":{"[input]":"41a1~545e"},"deps_state":{"[Process(0)]":"9e62~7b9e"},"direct_world_state":{"[input]":"41a1~545e"}}}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Push":{"key":"[Process(2)]","entry":{"value":"\"os\"","fingerprint":"6209~8288","world_state":{"[input]":"41a1~545e"},"deps_state":{"[Process(0)]":"9e62~7b9e"},"direct_world_state":{"[input]":"41a1~545e"}}}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Comment":{"content":"Process 2 started"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Push":{"key":"[Process(5)]","entry":{"value":"\"fsysos\"","fingerprint":"e59e~b910","world_state":{"[input]":"41a1~545e"},"deps_state":{"[Process(0)]":"9e62~7b9e","[Process(2)]":"6209~8288","[Process(1)]":"11b9~de2e"},"direct_world_state":{"[input]":"41a1~545e"}}}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Push":{"key":"[Process(9)]","entry":{"value":"\"ssysls\"","fingerprint":"1222~ccc8","world_state":{"[input]":"41a1~545e"},"deps_state":{"[Process(1)]":"11b9~de2e","[Process(0)]":"9e62~7b9e","[Process(4)]":"ce52~d2da"},"direct_world_state":{"[input]":"41a1~545e"}}}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Push":{"key":"[Process(3)]","entry":{"value":"\"csys\"","fingerprint":"11a4~ebcb","world_state":{"[input]":"41a1~545e"},"deps_state":{"[Process(1)]":"11b9~de2e","[Process(0)]":"9e62~7b9e"},"direct_world_state":{"[input]":"41a1~545e"}}}}
+{"Comment":{"content":"Process 3 started"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Push":{"key":"[Process(6)]","entry":{"value":"\"ds\"","fingerprint":"e7f4~d4a3","world_state":{"[input]":"41a1~545e"},"deps_state":{"[Process(0)]":"9e62~7b9e"},"direct_world_state":{"[input]":"41a1~545e"}}}}
+{"Comment":{"content":"Process 2 started"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Comment":{"content":"Process 8 started"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Push":{"key":"[Process(7)]","entry":{"value":"\"isyscsys\"","fingerprint":"259f~3169","world_state":{"[input]":"41a1~545e"},"deps_state":{"[Process(0)]":"9e62~7b9e","[Process(3)]":"11a4~ebcb","[Process(1)]":"11b9~de2e"},"direct_world_state":{"[input]":"41a1~545e"}}}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Comment":{"content":"Process 3 started"}}
+{"Push":{"key":"[Process(8)]","entry":{"value":"\"jsos\"","fingerprint":"85e0~8a28","world_state":{"[input]":"41a1~545e"},"deps_state":{"[Process(2)]":"6209~8288","[Process(0)]":"9e62~7b9e"},"direct_world_state":{"[input]":"41a1~545e"}}}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Comment":{"content":"Process 3 started"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Comment":{"content":"Process 8 started"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Comment":{"content":"Process 3 started"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Comment":{"content":"Process 5 started"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"NewChapter":{"data":"|syjclfdihs|","fingerprint":"8c41~8f78"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Comment":{"content":"Process 2 started"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Comment":{"content":"Process 3 started"}}
+{"Remove":{"key":"[Process(7)]"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Comment":{"content":"Process 2 started"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Comment":{"content":"Process 3 started"}}
+{"Comment":{"content":"Process 8 started"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Comment":{"content":"Process 8 started"}}
+{"Remove":{"key":"[Process(1)]"}}
+{"Comment":{"content":"Process 3 started"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Comment":{"content":"Process 3 started"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Remove":{"key":"[Process(8)]"}}
+{"Remove":{"key":"[Process(2)]"}}
+{"Remove":{"key":"[Process(4)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Remove":{"key":"[Process(6)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Remove":{"key":"[Process(9)]"}}
+{"Remove":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Remove":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Comment":{"content":"Process 8 started"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Comment":{"content":"Process 8 started"}}
+{"Push":{"key":"[Process(0)]","entry":{"value":"\"s\"","fingerprint":"9e62~7b9e","world_state":{"[input]":"8c41~8f78"},"deps_state":{},"direct_world_state":{"[input]":"8c41~8f78"}}}}
+{"Comment":{"content":"Process 9 started"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 2 started"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Push":{"key":"[Process(6)]","entry":{"value":"\"ds\"","fingerprint":"e7f4~d4a3","world_state":{"[input]":"8c41~8f78"},"deps_state":{"[Process(0)]":"9e62~7b9e"},"direct_world_state":{"[input]":"8c41~8f78"}}}}
+{"Comment":{"content":"Process 1 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 5 started"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Push":{"key":"[Process(4)]","entry":{"value":"\"ls\"","fingerprint":"ce52~d2da","world_state":{"[input]":"8c41~8f78"},"deps_state":{"[Process(0)]":"9e62~7b9e"},"direct_world_state":{"[input]":"8c41~8f78"}}}}
+{"Comment":{"content":"Process 5 started"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Push":{"key":"[Process(1)]","entry":{"value":"\"ys\"","fingerprint":"11b9~de2e","world_state":{"[input]":"8c41~8f78"},"deps_state":{"[Process(0)]":"9e62~7b9e"},"direct_world_state":{"[input]":"8c41~8f78"}}}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Comment":{"content":"Process 8 started"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Push":{"key":"[Process(2)]","entry":{"value":"\"js\"","fingerprint":"3093~bf94","world_state":{"[input]":"8c41~8f78"},"deps_state":{"[Process(0)]":"9e62~7b9e"},"direct_world_state":{"[input]":"8c41~8f78"}}}}
+{"Comment":{"content":"Process 6 started"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Comment":{"content":"Process 5 started"}}
+{"Push":{"key":"[Process(9)]","entry":{"value":"\"ssysls\"","fingerprint":"1222~ccc8","world_state":{"[input]":"8c41~8f78"},"deps_state":{"[Process(0)]":"9e62~7b9e","[Process(1)]":"11b9~de2e","[Process(4)]":"ce52~d2da"},"direct_world_state":{"[input]":"8c41~8f78"}}}}
+{"Comment":{"content":"Process 6 started"}}
+{"Push":{"key":"[Process(8)]","entry":{"value":"\"hsjs\"","fingerprint":"8768~fca6","world_state":{"[input]":"8c41~8f78"},"deps_state":{"[Process(2)]":"3093~bf94","[Process(0)]":"9e62~7b9e"},"direct_world_state":{"[input]":"8c41~8f78"}}}}
+{"Push":{"key":"[Process(3)]","entry":{"value":"\"csys\"","fingerprint":"11a4~ebcb","world_state":{"[input]":"8c41~8f78"},"deps_state":{"[Process(1)]":"11b9~de2e","[Process(0)]":"9e62~7b9e"},"direct_world_state":{"[input]":"8c41~8f78"}}}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Remove":{"key":"[Process(5)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Push":{"key":"[Process(7)]","entry":{"value":"\"isyscsys\"","fingerprint":"259f~3169","world_state":{"[input]":"8c41~8f78"},"deps_state":{"[Process(1)]":"11b9~de2e","[Process(3)]":"11a4~ebcb","[Process(0)]":"9e62~7b9e"},"direct_world_state":{"[input]":"8c41~8f78"}}}}
+{"Comment":{"content":"Process 7 started"}}
+{"Comment":{"content":"Process 8 started"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Comment":{"content":"Process 8 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 8 started"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Comment":{"content":"Process 2 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Comment":{"content":"Process 8 started"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Push":{"key":"[Process(5)]","entry":{"value":"\"fsysjs\"","fingerprint":"7145~2792","world_state":{"[input]":"8c41~8f78"},"deps_state":{"[Process(1)]":"11b9~de2e","[Process(2)]":"3093~bf94","[Process(0)]":"9e62~7b9e"},"direct_world_state":{"[input]":"8c41~8f78"}}}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Comment":{"content":"Process 5 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 5 started"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Comment":{"content":"Process 2 started"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Comment":{"content":"Process 3 started"}}
+{"Comment":{"content":"Process 8 started"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Comment":{"content":"Process 8 started"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Comment":{"content":"Process 5 started"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Comment":{"content":"Process 5 started"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Comment":{"content":"Process 3 started"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Comment":{"content":"Process 2 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 8 started"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Comment":{"content":"Process 5 started"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Comment":{"content":"Process 8 started"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Comment":{"content":"Process 3 started"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Comment":{"content":"Process 2 started"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"NewChapter":{"data":"|lyaclfdiks|","fingerprint":"a0c7~4869"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 2 started"}}
+{"Remove":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Remove":{"key":"[Process(9)]"}}
+{"Comment":{"content":"Process 5 started"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Comment":{"content":"Process 2 started"}}
+{"Comment":{"content":"Process 3 started"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Remove":{"key":"[Process(5)]"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Push":{"key":"[Process(0)]","entry":{"value":"\"l\"","fingerprint":"ded6~c816","world_state":{"[input]":"a0c7~4869"},"deps_state":{},"direct_world_state":{"[input]":"a0c7~4869"}}}}
+{"Comment":{"content":"Process 6 started"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Remove":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Remove":{"key":"[Process(6)]"}}
+{"Comment":{"content":"Process 2 started"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Comment":{"content":"Process 3 started"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Remove":{"key":"[Process(3)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Remove":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Comment":{"content":"Process 8 started"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Remove":{"key":"[Process(1)]"}}
+{"Remove":{"key":"[Process(8)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Remove":{"key":"[Process(7)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Comment":{"content":"Process 5 started"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 5 started"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 5 started"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Comment":{"content":"Process 3 started"}}
+{"Comment":{"content":"Process 8 started"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Comment":{"content":"Process 5 started"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 2 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 5 started"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Push":{"key":"[Process(6)]","entry":{"value":"\"dl\"","fingerprint":"c5ff~ff55","world_state":{"[input]":"a0c7~4869"},"deps_state":{"[Process(0)]":"ded6~c816"},"direct_world_state":{"[input]":"a0c7~4869"}}}}
+{"Comment":{"content":"Process 4 started"}}
+{"Push":{"key":"[Process(1)]","entry":{"value":"\"yl\"","fingerprint":"bf2f~4243","world_state":{"[input]":"a0c7~4869"},"deps_state":{"[Process(0)]":"ded6~c816"},"direct_world_state":{"[input]":"a0c7~4869"}}}}
+{"Comment":{"content":"Process 7 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Comment":{"content":"Process 5 started"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Comment":{"content":"Process 5 started"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Push":{"key":"[Process(4)]","entry":{"value":"\"ll\"","fingerprint":"78e2~079f","world_state":{"[input]":"a0c7~4869"},"deps_state":{"[Process(0)]":"ded6~c816"},"direct_world_state":{"[input]":"a0c7~4869"}}}}
+{"Comment":{"content":"Process 6 started"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Push":{"key":"[Process(3)]","entry":{"value":"\"clyl\"","fingerprint":"d6e2~e9b3","world_state":{"[input]":"a0c7~4869"},"deps_state":{"[Process(1)]":"bf2f~4243","[Process(0)]":"ded6~c816"},"direct_world_state":{"[input]":"a0c7~4869"}}}}
+{"Comment":{"content":"Process 0 started"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Comment":{"content":"Process 2 started"}}
+{"Comment":{"content":"Process 5 started"}}
+{"Push":{"key":"[Process(2)]","entry":{"value":"\"al\"","fingerprint":"d062~4c2a","world_state":{"[input]":"a0c7~4869"},"deps_state":{"[Process(0)]":"ded6~c816"},"direct_world_state":{"[input]":"a0c7~4869"}}}}
+{"Comment":{"content":"Process 4 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Push":{"key":"[Process(7)]","entry":{"value":"\"ilylclyl\"","fingerprint":"02ba~21f4","world_state":{"[input]":"a0c7~4869"},"deps_state":{"[Process(0)]":"ded6~c816","[Process(3)]":"d6e2~e9b3","[Process(1)]":"bf2f~4243"},"direct_world_state":{"[input]":"a0c7~4869"}}}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 5 started"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Comment":{"content":"Process 2 started"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Push":{"key":"[Process(5)]","entry":{"value":"\"flylal\"","fingerprint":"496c~8d5c","world_state":{"[input]":"a0c7~4869"},"deps_state":{"[Process(0)]":"ded6~c816","[Process(2)]":"d062~4c2a","[Process(1)]":"bf2f~4243"},"direct_world_state":{"[input]":"a0c7~4869"}}}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 3 started"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Comment":{"content":"Process 4 started"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Push":{"key":"[Process(8)]","entry":{"value":"\"klal\"","fingerprint":"89b0~c50c","world_state":{"[input]":"a0c7~4869"},"deps_state":{"[Process(0)]":"ded6~c816","[Process(2)]":"d062~4c2a"},"direct_world_state":{"[input]":"a0c7~4869"}}}}
+{"Comment":{"content":"Process 5 started"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Comment":{"content":"Process 8 started"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Comment":{"content":"Process 2 started"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Comment":{"content":"Process 7 started"}}
+{"Comment":{"content":"Process 8 started"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Push":{"key":"[Process(9)]","entry":{"value":"\"slysll\"","fingerprint":"e413~7e42","world_state":{"[input]":"a0c7~4869"},"deps_state":{"[Process(0)]":"ded6~c816","[Process(1)]":"11b9~de2e","[Process(4)]":"78e2~079f"},"direct_world_state":{"[input]":"a0c7~4869"}}}}
+{"Comment":{"content":"Process 0 started"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Comment":{"content":"Process 3 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Comment":{"content":"Process 2 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Comment":{"content":"Process 9 started"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Comment":{"content":"Process 0 started"}}
+{"Comment":{"content":"Process 5 started"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Comment":{"content":"Process 2 started"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Comment":{"content":"Process 6 started"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Comment":{"content":"Process 1 started"}}
+{"Comment":{"content":"Process 5 started"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(4)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(7)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(8)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(3)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(9)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(0)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(2)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(6)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(1)]"}}
+{"Pull":{"key":"[Process(5)]"}}
+{"Pull":{"key":"[Process(5)]"}}

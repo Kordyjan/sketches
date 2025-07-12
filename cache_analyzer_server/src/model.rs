@@ -33,19 +33,9 @@ pub(crate) struct KeyedEntry {
 pub(crate) struct CacheEntryDetail {
     pub(crate) value: String,
     pub(crate) fingerprint: String,
-    pub(crate) world_state: WorldMap,
-    pub(crate) direct_world_state: WorldMap,
+    pub(crate) world_state: DepsMap,
+    pub(crate) direct_world_state: DepsMap,
     pub(crate) deps_state: DepsMap,
-}
-
-#[derive(Serialize, Clone)]
-pub(crate) struct WorldMap(pub(crate) Vec<WorldEntry>);
-
-#[derive(Serialize, Clone)]
-pub(crate) struct WorldEntry {
-    pub(crate) freshness: Freshness,
-    pub(crate) key: String,
-    pub(crate) fingerprint: String,
 }
 
 #[derive(Serialize, Clone)]
@@ -53,6 +43,7 @@ pub(crate) struct DepsMap(pub(crate) Vec<DepsEntry>);
 
 #[derive(Serialize, Clone)]
 pub(crate) struct DepsEntry {
+    pub(crate) freshness: Freshness,
     pub(crate) key: String,
     pub(crate) fingerprint: String,
 }

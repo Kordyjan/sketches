@@ -1,7 +1,6 @@
 use crate::model::Freshness::{Fresh, Stale};
 use crate::model::{
     CacheEntryDetail, Chapter, ChapterDetail, DepsEntry, DepsMap, KeyedEntry, OpHead, Snapshot,
-    WorldEntry, WorldMap,
 };
 use per_set::PerMap;
 use rocket::serde::json::serde_json;
@@ -49,9 +48,15 @@ impl ChaptersState {
                             .0
                             .iter_mut()
                             .for_each(|e| e.freshness = Stale);
+                        stale_entry
+                            .direct_world_state
+                            .0
+                            .iter_mut()
+                            .for_each(|e| e.freshness = Stale);
                         stale_cache = stale_cache.insert(arc.0.clone(), stale_entry);
                     }
-                    current_chapter_messages.push((message, CacheState(stale_cache)));
+                    cache = CacheState(stale_cache);
+                    current_chapter_messages.push((message, cache.clone()));
                 }
                 Message::End {} => {
                     // End of trace
@@ -63,9 +68,11 @@ impl ChaptersState {
                             .0
                             .insert(key.clone(), Self::translate(entry, &input_fingerprint)),
                     );
+                    current_chapter_messages.push((message, cache.clone()));
                 }
                 Message::Remove { key } => {
                     cache = CacheState(cache.0.remove(key));
+                    current_chapter_messages.push((message, cache.clone()));
                 }
                 _ => current_chapter_messages.push((message, cache.clone())),
             }
@@ -122,7 +129,7 @@ impl ChaptersState {
         let world_state = entry
             .world_state
             .iter()
-            .map(|(key, fingerprint)| WorldEntry {
+            .map(|(key, fingerprint)| DepsEntry {
                 key: key.clone(),
                 fingerprint: fingerprint.clone(),
                 freshness: if input_fingerprint == fingerprint {
@@ -132,7 +139,7 @@ impl ChaptersState {
                 },
             })
             .collect();
-        let world_state = WorldMap(world_state);
+        let world_state = DepsMap(world_state);
 
         let deps_state = entry
             .deps_state
@@ -140,6 +147,7 @@ impl ChaptersState {
             .map(|(key, fingerprint)| DepsEntry {
                 key: key.clone(),
                 fingerprint: fingerprint.clone(),
+                freshness: Fresh,
             })
             .collect();
         let deps_state = DepsMap(deps_state);
@@ -147,7 +155,7 @@ impl ChaptersState {
         let direct_world_state = entry
             .direct_world_state
             .iter()
-            .map(|(key, fingerprint)| WorldEntry {
+            .map(|(key, fingerprint)| DepsEntry {
                 key: key.clone(),
                 fingerprint: fingerprint.clone(),
                 freshness: if input_fingerprint == fingerprint {
@@ -157,9 +165,7 @@ impl ChaptersState {
                 },
             })
             .collect();
-        let direct_world_state = WorldMap(direct_world_state);
-
-        println!("!");
+        let direct_world_state = DepsMap(direct_world_state);
 
         CacheEntryDetail {
             value: entry.value.clone(),
@@ -178,12 +184,13 @@ impl ChaptersState {
         self.chapters[chapter]
             .iter()
             .filter_map(|(message, _)| match message {
+                Message::NewChapter { .. } => Some(("NewChapter".to_string(), true)),
                 Message::Pull { key } => Some((format!("Pull {key}"), false)),
                 Message::Push { key, .. } => Some((format!("Push {key}"), false)),
                 Message::Modify { key, .. } => Some((format!("Modify {key}"), false)),
                 Message::Remove { key } => Some((format!("Remove {key}"), false)),
                 Message::Comment { content } => Some((content.clone(), true)),
-                _ => None, // Skip NewChapter, Comment, and End messages
+                _ => None, // Skip End messages
             })
             .enumerate()
             .map(|(id, (desc, is_comment))| OpHead {
@@ -216,7 +223,7 @@ impl ChaptersState {
         let (_, cache_state) = &self.chapters[chapter][op];
 
         // Convert CacheState to Snapshot
-        let keyed_entries: Vec<KeyedEntry> = cache_state
+        let mut keyed_entries: Vec<KeyedEntry> = cache_state
             .0
             .iter()
             .map(|arc| KeyedEntry {
@@ -224,6 +231,9 @@ impl ChaptersState {
                 entry: arc.1.clone(),
             })
             .collect();
+
+        // Sort entries by key
+        keyed_entries.sort_by(|a, b| a.key.cmp(&b.key));
 
         Some(Snapshot(keyed_entries))
     }
