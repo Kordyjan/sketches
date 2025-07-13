@@ -348,7 +348,7 @@ impl Executor for Arc<Reactor> {
 
     async fn trace(&self) -> Vec<String> {
         let mut lock = self.trace.lock().await;
-        while let Some(message) = lock.1.next().await {
+        while let Ok(Some(message)) = lock.1.try_next() {
             lock.0.push(message);
         }
         Vec::clone(&lock.0)
