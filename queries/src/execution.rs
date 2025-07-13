@@ -1,17 +1,16 @@
-use crate::{ErasedQuery, Executor, Query};
-use anyhow::{anyhow, bail, Context, Result};
-use cache::{
-    cache::{Cache, Cached}, data::{ErasedResponse, Object, Param, QueryResponse},
-    fingerprinting::{stamp_with_fingerprint, Fingerprint},
-    QDashMap,
-    QueryId,
+use crate::{
+    ErasedQuery, Executor, QDashMap, Query, QueryId,
+    cache::{Cache, Cached},
+    data::{ErasedResponse, Object, Param, QueryResponse},
+    fingerprinting::{Fingerprint, stamp_with_fingerprint},
 };
+use anyhow::{Context, Result, anyhow, bail};
 use dashmap::DashSet;
 use futures::{
-    channel::mpsc::{self, UnboundedReceiver, UnboundedSender}, lock::Mutex,
+    FutureExt, StreamExt,
+    channel::mpsc::{self, UnboundedReceiver, UnboundedSender},
+    lock::Mutex,
     stream::FuturesUnordered,
-    FutureExt,
-    StreamExt,
 };
 use per_set::{PerMap, PerSet};
 use rustc_hash::FxBuildHasher;

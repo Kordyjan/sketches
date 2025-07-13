@@ -299,17 +299,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d71b6127be86fdcfddb610f7182ac57211d4b18a3e9c82eb2d17662f2227ad6a"
 
 [[package]]
-name = "cache"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "dashmap",
- "per_set",
- "rustc-hash",
- "rustc-stable-hash",
-]
-
-[[package]]
 name = "cache_analyzer_server"
 version = "0.1.0"
 dependencies = [
@@ -1372,13 +1361,13 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-global-executor 2.4.1",
- "cache",
  "dashmap",
  "futures",
  "ntest",
  "per_set",
  "proptest",
  "rustc-hash",
+ "rustc-stable-hash",
  "smallvec",
  "trait-variant",
 ]
@@ -1390,7 +1379,6 @@ dependencies = [
  "anyhow",
  "async-global-executor 3.1.0",
  "async-std",
- "cache",
  "divisors_fixed",
  "futures",
  "itertools",
@@ -2066,10 +2054,10 @@ name = "tracer"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "cache",
  "dashmap",
  "futures",
  "per_set",
+ "queries",
  "rustc-hash",
  "serde_json",
  "tracer_types",

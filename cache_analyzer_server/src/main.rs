@@ -1,7 +1,7 @@
 use crate::model::{Chapter, ChapterDetail, Snapshot};
 use crate::state::ChaptersState;
 use rocket::serde::json::Json;
-use rocket::{get, launch, routes, State};
+use rocket::{State, get, launch, routes};
 use rocket_cors::{AllowedOrigins, CorsOptions};
 
 mod model;

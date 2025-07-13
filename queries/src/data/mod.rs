@@ -1,5 +1,5 @@
-use crate::serialization::{Reader, Writer};
 use crate::QueryId;
+use crate::serialization::{Reader, Writer};
 use anyhow::Result;
 use std::fmt::Debug;
 use std::{any::Any, marker::PhantomData, sync::Arc};

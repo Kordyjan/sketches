@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 
-use cache::{
-    cache::{Cache, Cached}, fingerprinting::Fingerprint,
-    QDashMap,
-    QueryId,
-};
-use dashmap::{mapref::one::Ref, Entry};
+use dashmap::{Entry, mapref::one::Ref};
 use futures::channel::mpsc::UnboundedSender;
 use per_set::PerMap;
+use queries::{
+    QDashMap, QueryId,
+    cache::{Cache, Cached},
+    fingerprinting::Fingerprint,
+};
 use tracer_types::{CacheEntry, Message};
 
 pub struct TracingCache {

@@ -1,5 +1,5 @@
 use anyhow::Result;
-use futures::{channel::mpsc::UnboundedReceiver, StreamExt};
+use futures::{StreamExt, channel::mpsc::UnboundedReceiver};
 use std::{
     fs::File,
     io::{BufWriter, Write},

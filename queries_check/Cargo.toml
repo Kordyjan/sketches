@@ -13,7 +13,6 @@ async-global-executor = "3"
 rand = "0.9"
 itertools = "0.14"
 rustc-hash = "2"
-cache = { path = "../cache" }
 tracer = { path = "../tracer" }
 tracer_types = { path = "../tracer_types" }
 

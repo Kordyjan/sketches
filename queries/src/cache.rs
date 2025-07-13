@@ -1,8 +1,8 @@
 use crate::data::Object;
 use crate::fingerprinting::Fingerprint;
 use crate::{QDashMap, QueryId};
-use dashmap::mapref::one::Ref;
 use dashmap::Entry;
+use dashmap::mapref::one::Ref;
 use per_set::PerMap;
 use std::sync::Arc;
 
@@ -26,7 +26,7 @@ impl Cache for QDashMap<Cached> {
         self.remove(key)
     }
 
-    fn modify(&self, key: QueryId, f: Box<dyn FnOnce(&mut Cached) + '_>) -> Entry<QueryId, Cached>{
+    fn modify(&self, key: QueryId, f: Box<dyn FnOnce(&mut Cached) + '_>) -> Entry<QueryId, Cached> {
         self.entry(key).and_modify(|cached| f(cached))
     }
 }
