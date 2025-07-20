@@ -4,8 +4,14 @@ import type { Snapshot } from '$lib/data';
 export const load: PageLoad = async ({ params, fetch }) => {
 	const cache_state = fetch(
 		`http://127.0.0.1:8000/chapters/${params.ch}/${params.op}/snapshot`
-	).then((r) => r.json());
+	).then(r => r.json());
+	const stack = fetch(
+		`http://127.0.0.1:8000/chapters/${params.ch}/${params.op}/stack`
+	).then(r => r.json());
+
 	return {
-		cache_state: (await cache_state) as Snapshot
+		cache_state: (await cache_state) as Snapshot,
+		stack: (await stack) as string[],
+		currentOp: parseInt(params.op),
 	};
 };

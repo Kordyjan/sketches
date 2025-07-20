@@ -1,14 +1,14 @@
-use crate::query::{INPUT, NonlockingProcess, Process, mix};
+use crate::query::{mix, NonlockingProcess, Process, INPUT};
 use async_global_executor::spawn;
 use async_std::sync::RwLock;
 use divisors_fixed::Divisors;
 use futures::future::TryJoinAll;
 use itertools::Itertools;
-use queries::{Executor, execution::Reactor, fingerprinting::stamp_with_fingerprint};
-use rand::{Rng, distr};
+use queries::fingerprinting::stamp_with_fingerprint;
+use queries::{execution::Reactor, Executor};
+use rand::{distr, Rng};
 use rustc_hash::FxHashMap;
 use std::{collections::HashMap, iter, sync::Arc};
-use tracer_types::Message;
 
 pub(crate) mod query;
 
@@ -74,11 +74,11 @@ async fn mutable_scenario(
 
     let steps = calc_steps(&groups);
 
-    let (output, cache, sender) = tracer::create_cache("../tmp/trace.json").unwrap();
+    let (output, tracer, chapter_marker) = tracer::create_full("../tmp/trace.json").unwrap();
 
     let lock = Arc::new(RwLock::new(()));
     spawn(output.run()).detach();
-    let reactor = Arc::new(Reactor::with_cache(cache));
+    let reactor = Arc::new(Reactor::with_trace(tracer));
     reactor.set_param(&INPUT, input.clone());
 
     for Step {
@@ -94,13 +94,7 @@ async fn mutable_scenario(
             .map(|n| {
                 let reactor = Arc::clone(&reactor);
                 let lock = Arc::clone(&lock);
-                let sender = sender.clone();
-                async move {
-                    let _ = sender.unbounded_send(Message::Comment {
-                        content: format!("Process {n} started"),
-                    });
-                    reactor.execute(Process(n, lock)).await
-                }
+                async move { reactor.execute(Process(n, lock)).await }
             })
             .collect::<TryJoinAll<_>>();
         let nonlocking_processes = nonlocking_processes
@@ -119,10 +113,7 @@ async fn mutable_scenario(
             input[n] = v;
         }
         let (fingerprint, _) = stamp_with_fingerprint(Arc::new(input.clone()));
-        let _ = sender.unbounded_send(Message::NewChapter {
-            data: format!("|{}|", input.join("")),
-            fingerprint: format!("{fingerprint:?}"),
-        });
+        chapter_marker.new_chapter(format!("|{}|", input.join("")), format!("{fingerprint:?}"));
         reactor.set_param(&INPUT, input.clone());
 
         let mut cache = FxHashMap::default();

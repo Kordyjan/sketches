@@ -1,7 +1,7 @@
 use crate::model::{Chapter, ChapterDetail, Snapshot};
 use crate::state::ChaptersState;
 use rocket::serde::json::Json;
-use rocket::{State, get, launch, routes};
+use rocket::{get, launch, routes, State};
 use rocket_cors::{AllowedOrigins, CorsOptions};
 
 mod model;
@@ -15,9 +15,9 @@ fn rocket() -> _ {
         .unwrap();
 
     rocket::build()
-        .manage(ChaptersState::read("tmp/trace.json"))
+        .manage(ChaptersState::read("tmp/trace2.json"))
         .attach(config)
-        .mount("/", routes![chapter_list, chapter_detail, snapshot])
+        .mount("/", routes![chapter_list, chapter_detail, snapshot, stack])
 }
 
 #[get("/chapters")]
@@ -33,4 +33,10 @@ fn chapter_detail(state: &State<ChaptersState>, ch: usize) -> Option<Json<Chapte
 #[get("/chapters/<ch>/<op>/snapshot")]
 fn snapshot(state: &State<ChaptersState>, ch: usize, op: usize) -> Option<Json<Snapshot>> {
     state.get_snapshot(ch, op).map(Json)
+}
+
+#[get("/chapters/<ch>/<op>/stack")]
+fn stack(state: &State<ChaptersState>, ch: usize, op: usize) -> Json<Vec<String>> {
+    println!("ch: {ch}, op: {op}");
+    Json(state.get_stack(ch, op))
 }

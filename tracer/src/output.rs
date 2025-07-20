@@ -1,5 +1,8 @@
 use anyhow::Result;
-use futures::{StreamExt, channel::mpsc::UnboundedReceiver};
+use futures::{
+    StreamExt,
+    channel::mpsc::{UnboundedReceiver, UnboundedSender},
+};
 use std::{
     fs::File,
     io::{BufWriter, Write},
@@ -31,5 +34,15 @@ impl Output {
 impl Drop for Output {
     fn drop(&mut self) {
         let _ = self.writer.flush();
+    }
+}
+
+pub struct ChapterMarker(pub(crate) UnboundedSender<Message>);
+
+impl ChapterMarker {
+    pub fn new_chapter(&self, data: String, fingerprint: String) {
+        let _ = self
+            .0
+            .unbounded_send(Message::NewChapter { data, fingerprint });
     }
 }

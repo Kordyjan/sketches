@@ -1,16 +1,15 @@
 use crate::{
-    ErasedQuery, Executor, QDashMap, Query, QueryId,
-    cache::{Cache, Cached},
-    data::{ErasedResponse, Object, Param, QueryResponse},
-    fingerprinting::{Fingerprint, stamp_with_fingerprint},
+    data::{ErasedResponse, Object, Param, QueryResponse}, fingerprinting::{stamp_with_fingerprint, Fingerprint}, trace::{NoOpTrace, Trace}, ErasedQuery, Executor,
+    QDashMap,
+    Query,
+    QueryId,
 };
-use anyhow::{Context, Result, anyhow, bail};
-use dashmap::DashSet;
+use anyhow::{anyhow, bail, Context, Result};
+use dashmap::{mapref::one::Ref, DashSet};
 use futures::{
-    FutureExt, StreamExt,
-    channel::mpsc::{self, UnboundedReceiver, UnboundedSender},
-    lock::Mutex,
-    stream::FuturesUnordered,
+    channel::mpsc::{self, UnboundedSender}, stream::FuturesUnordered,
+    FutureExt,
+    StreamExt,
 };
 use per_set::{PerMap, PerSet};
 use rustc_hash::FxBuildHasher;
@@ -22,13 +21,19 @@ use std::{
     task::{Context as WakeContext, Poll, Waker},
 };
 
-type CacheMap = PerMap<QueryId, Fingerprint>;
+pub type CacheMap = PerMap<QueryId, Fingerprint>;
+
+pub struct Cached {
+    pub result: anyhow::Result<(Fingerprint, Arc<dyn Object>)>,
+    pub world_state: CacheMap,
+    pub deps_state: CacheMap,
+    pub direct_world_state: CacheMap,
+}
 
 pub struct Reactor {
     params: QDashMap<(Fingerprint, Arc<dyn Object>)>,
-    trace: Mutex<(Vec<String>, UnboundedReceiver<String>)>,
-    trace_sender: UnboundedSender<String>,
-    cache: Box<dyn Cache + Sync + Send + 'static>,
+    trace: Box<dyn Trace + Send + Sync + 'static>,
+    cache: QDashMap<Cached>,
     current: QDashMap<SmallVec<[Waker; 4]>>,
     past_queries: QDashMap<ErasedQuery>,
 }
@@ -42,24 +47,21 @@ impl Default for Reactor {
 impl Reactor {
     #[must_use]
     pub fn new() -> Self {
-        let (trace_sender, trace_receiver) = mpsc::unbounded();
         Reactor {
             params: QDashMap::default(),
-            trace: Mutex::new((Vec::new(), trace_receiver)),
-            trace_sender,
-            cache: Box::new(QDashMap::default()),
+            trace: Box::new(NoOpTrace),
+            cache: QDashMap::default(),
             current: QDashMap::default(),
             past_queries: QDashMap::default(),
         }
     }
 
-    pub fn with_cache<T: Cache + Sync + Send + 'static>(cache: T) -> Self {
-        let (trace_sender, trace_receiver) = mpsc::unbounded();
-        Reactor {
+    #[must_use]
+    pub fn with_trace(trace: impl Trace + Sync + Send + 'static) -> Self {
+        Self {
             params: QDashMap::default(),
-            trace: Mutex::new((Vec::new(), trace_receiver)),
-            trace_sender,
-            cache: Box::new(cache),
+            trace: Box::new(trace),
+            cache: QDashMap::default(),
             current: QDashMap::default(),
             past_queries: QDashMap::default(),
         }
@@ -67,6 +69,40 @@ impl Reactor {
 
     fn new_continuity(self: &Arc<Self>) -> Arc<Continuity> {
         Arc::new(Continuity::new(Arc::clone(self)))
+    }
+
+    fn cache_pull(
+        &self,
+        key: &QueryId,
+        reason: &'static str,
+        context: Option<&ExecutionContext>,
+    ) -> Option<Ref<QueryId, Cached>> {
+        self.trace.cache_pull(key, reason, context);
+        self.cache.get(key)
+    }
+
+    fn cache_push(&self, key: QueryId, entry: Cached, context: Option<&ExecutionContext>) {
+        self.trace.cache_push(&key, &entry, context);
+        self.cache.insert(key, entry);
+    }
+
+    fn cache_modify(
+        &self,
+        key: &QueryId,
+        f: impl FnOnce(&mut Cached),
+        context: Option<&ExecutionContext>,
+    ) {
+        match self.cache.entry(key.clone()).and_modify(f) {
+            dashmap::Entry::Occupied(occupied_entry) => {
+                self.trace.cache_modify(key, occupied_entry.get(), context);
+            }
+            dashmap::Entry::Vacant(_) => unreachable!(),
+        }
+    }
+
+    fn cache_remove(&self, key: &QueryId, context: Option<&ExecutionContext>) {
+        self.trace.cache_remove(key, context);
+        self.cache.remove(key);
     }
 
     fn do_execute<Q, T>(
@@ -90,16 +126,17 @@ impl Reactor {
         let handle = async_global_executor::spawn(async move {
             let id = query.id();
 
-            let cache_correct = match reactor.cache.pull(&id) {
-                Some(cached) if reactor.verify(&cached.world_state) => true,
-                Some(cached) if !reactor.verify(&cached.direct_world_state) => false,
-                Some(cached) => {
-                    let deps_state = cached.deps_state.clone();
-                    drop(cached);
-                    Self::recheck(&reactor, &id, deps_state).await
-                }
-                None => false,
-            };
+            let cache_correct =
+                match reactor.cache_pull(&id, "First check", parent_context.as_ref()) {
+                    Some(cached) if reactor.verify(&cached.world_state) => true,
+                    Some(cached) if !reactor.verify(&cached.direct_world_state) => false,
+                    Some(cached) => {
+                        let deps_state = cached.deps_state.clone();
+                        drop(cached);
+                        Self::recheck(&reactor, &id, deps_state, parent_context.as_ref()).await
+                    }
+                    None => false,
+                };
 
             if !cache_correct {
                 let cached = loop {
@@ -110,18 +147,15 @@ impl Reactor {
                         break res;
                     }
                 };
+                reactor.trace.body_run(&query.id(), parent_context.as_ref());
 
-                if let Some(ExecutionContext(parent)) = parent_context {
+                if let Some(ExecutionContext(ref parent)) = parent_context {
                     let _ = parent
                         .world_dependencies
                         .unbounded_send(cached.world_state.clone());
                 }
 
-                reactor.cache.push(query.id().clone(), cached);
-                reactor
-                    .trace_sender
-                    .unbounded_send(id.to_string())
-                    .expect("Trace channel is broken.");
+                reactor.cache_push(query.id().clone(), cached, parent_context.as_ref());
             }
 
             reactor.past_queries.entry(id.clone()).or_insert_with(|| {
@@ -150,7 +184,7 @@ impl Reactor {
         query: impl Query<Response = T>,
         parent_context: Option<ExecutionContext>,
     ) -> Option<Cached> {
-        self.cache.remove(&query.id());
+        self.cache_remove(&query.id(), parent_context.as_ref());
         let (world_sender, mut world_receiver) = mpsc::unbounded();
         let (direct_world_sender, mut direct_world_receiver) = mpsc::unbounded();
         let (deps_sender, mut deps_receiver) = mpsc::unbounded();
@@ -217,12 +251,16 @@ impl Reactor {
         })
     }
 
-    async fn recheck(reactor: &Arc<Reactor>, id: &QueryId, deps_state: CacheMap) -> bool {
+    async fn recheck(
+        reactor: &Arc<Reactor>,
+        id: &QueryId,
+        deps_state: CacheMap,
+        parent_context: Option<&ExecutionContext>,
+    ) -> bool {
         if deps_state.is_empty() {
             false
         } else {
             let (world_sender, mut world_receiver) = mpsc::unbounded::<CacheMap>();
-            let (direct_world_sender, mut direct_world_receiver) = mpsc::unbounded::<CacheMap>();
             let iter = deps_state.iter().map(|state| async {
                 let Some(query) = reactor.past_queries.get(&state.0) else {
                     return false;
@@ -238,17 +276,11 @@ impl Reactor {
                     false
                 };
                 if res {
-                    let world_ref = reactor.cache.pull(&id).unwrap().world_state.clone();
-                    let world = world_ref.clone();
-                    let direct_world_ref =
-                        reactor.cache.pull(&id).unwrap().direct_world_state.clone();
-                    let direct_world = direct_world_ref.clone();
-                    drop(world_ref);
-                    drop(direct_world_ref);
+                    let cached = reactor
+                        .cache_pull(&id, "World of rechecked", parent_context)
+                        .unwrap();
+                    let world = cached.world_state.clone();
                     if world_sender.unbounded_send(world).is_err() {
-                        return false;
-                    }
-                    if direct_world_sender.unbounded_send(direct_world).is_err() {
                         return false;
                     }
                 }
@@ -260,7 +292,6 @@ impl Reactor {
             let res = results.iter().all(|&a| a);
             if res {
                 drop(world_sender);
-                drop(direct_world_sender);
 
                 let mut world_state = CacheMap::empty();
                 while let Some(dep) = world_receiver.next().await {
@@ -271,24 +302,17 @@ impl Reactor {
                     }
                 }
 
-                let mut direct_world_state = CacheMap::empty();
-                while let Some(dep) = direct_world_receiver.next().await {
-                    if let Ok(new_state) = direct_world_state.non_overriding_union(&dep) {
-                        direct_world_state = new_state;
-                    } else {
-                        return false;
-                    }
-                }
-
-                reactor.cache.modify(
-                    id.clone(),
-                    Box::new(move |c| {
+                reactor.cache_modify(
+                    id,
+                    move |c| {
                         c.world_state = world_state;
-                        c.direct_world_state = direct_world_state;
-                    }),
+                    },
+                    parent_context,
                 );
             }
-            let val = reactor.cache.pull(id).unwrap();
+            let val = reactor
+                .cache_pull(id, "Rechecked value", parent_context)
+                .unwrap();
             println!(
                 "Recheck for {}: {} ({:?})",
                 id,
@@ -334,8 +358,7 @@ impl Executor for Arc<Reactor> {
                 let continuity = self.new_continuity();
                 let res = Arc::clone(&continuity).drive(query.clone()).await?;
                 let world_state = &self
-                    .cache
-                    .pull(&query.id())
+                    .cache_pull(&query.id(), "World of executed", None)
                     .context("Cache corrupted")?
                     .world_state;
                 if self.verify(world_state) {
@@ -343,14 +366,6 @@ impl Executor for Arc<Reactor> {
                 }
             }
         }
-    }
-
-    async fn trace(&self) -> Vec<String> {
-        let mut lock = self.trace.lock().await;
-        while let Ok(Some(message)) = lock.1.try_next() {
-            lock.0.push(message);
-        }
-        Vec::clone(&lock.0)
     }
 }
 
@@ -392,7 +407,11 @@ where
                     .start_processing(query, self.parent_context.clone());
             }
             Poll::Pending
-        } else if let Some(res2) = self.reactor.cache.pull(&self.query_id) {
+        } else if let Some(res2) = self.reactor.cache_pull(
+            &self.query_id,
+            "Is poll ready",
+            self.parent_context.as_ref(),
+        ) {
             let res = &res2.result;
             let res = res
                 .as_ref()
@@ -450,8 +469,11 @@ impl Continuity {
         let result: (Fingerprint, T::Boxed) = if self.fresh_queries.contains(&query.id()) {
             let cached_result = &self
                 .reactor
-                .cache
-                .pull(&query.id())
+                .cache_pull(
+                    &query.id(),
+                    "Query was fresh",
+                    parent_view.into().map(ExecutionContext).as_ref(),
+                )
                 .context("Cache was corrupted")?
                 .result;
             let Ok((fingerprint, value)) = cached_result.as_ref() else {
@@ -538,10 +560,10 @@ impl ExecutionContext {
         }
     }
 
-    pub fn run<T, Q>(&self, query: Q) -> impl Future<Output = Result<Arc<T>>> + Send
+    pub fn run<T, Q>(&self, query: Q) -> impl Future<Output = Result<T::Boxed>> + Send
     where
         Q: Query<Response = T> + Send + Sync + 'static,
-        T: Object,
+        T: QueryResponse,
     {
         async move {
             if self.0.dependents.contains(&query.id()) {
@@ -564,5 +586,9 @@ impl ExecutionContext {
                 .unbounded_send(PerMap::empty().insert(id.clone(), fingerprint))?;
             Ok(result)
         }
+    }
+
+    pub fn trace_iter(&self) -> impl Iterator<Item = QueryId> {
+        self.0.trace_iter()
     }
 }

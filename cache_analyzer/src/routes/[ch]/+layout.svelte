@@ -20,7 +20,7 @@
 		<OddEvenList data={toShow} keyFn={it => it.id} {current}>
 			{#snippet content(op: OpHead)}
 				<a href="{op.id.toString()}">
-					<div class="p-2" class:text-right={!op.is_comment} class:text-mono={!op.is_comment} transition:slide|global>
+					<div class="p-2" id="op-{op.id}" class:text-right={!op.is_comment} class:text-mono={!op.is_comment} transition:slide|global>
 						{op.desc}
 					</div>
 				</a>

@@ -6,7 +6,7 @@ use futures::future::BoxFuture;
 use rustc_hash::FxBuildHasher;
 use std::{any::Any, borrow::Cow, fmt::Display, future::Future, sync::Arc};
 
-pub mod cache;
+pub mod trace;
 pub mod data;
 pub mod execution;
 pub mod fingerprinting;
@@ -68,5 +68,4 @@ pub trait Executor {
     where
         Q: Query<Response = T>,
         T: QueryResponse;
-    fn trace(&self) -> impl Future<Output = Vec<String>>;
 }

@@ -1,6 +1,6 @@
 use crate::data::Param;
 use crate::execution::ExecutionContext;
-use crate::{Executor, Query, QueryId, execution::Reactor};
+use crate::{execution::Reactor, trace, Executor, Query, QueryId};
 use anyhow::Result;
 use async_global_executor::block_on;
 use futures::future::try_join_all;
@@ -26,8 +26,8 @@ fn queries_are_not_executed_when_no_changes_to_direct_dependencies_() {
     let (inc, dec) = (0, 1);
     let sum: u64 = values.iter().sum::<u64>() * 2;
 
-    // sleep(Duration::from_millis(50));
-    let ctx = Arc::new(Reactor::new());
+    let (tracer, reader) = trace::body_execution();
+    let ctx = Arc::new(Reactor::with_trace(tracer));
     ctx.set_param(&INPUT, values.clone());
     let result_sum = block_on(ctx.execute(Double));
     assert_eq!(sum, *result_sum.unwrap());
@@ -39,7 +39,7 @@ fn queries_are_not_executed_when_no_changes_to_direct_dependencies_() {
     let res = *result_sum.unwrap();
     assert_eq!(sum, res);
 
-    let doubling_num = block_on(ctx.trace())
+    let doubling_num = block_on(reader.get_trace())
         .iter()
         .filter(|s| s == &"[Double]")
         .count();
@@ -71,10 +71,11 @@ proptest! {
     fn trace_is_written(values in vec(0u64..1024, 0..10)) {
         let expected_middle: HashSet<String> = (0..values.len()).map(|n| format!("[RefRead({n})]")).collect();
         let len = values.len();
-        let ctx = Arc::new(Reactor::new());
-            ctx.set_param(&INPUT, values);
+        let (tracer, reader) = trace::body_execution();
+        let ctx = Arc::new(Reactor::with_trace(tracer));
+        ctx.set_param(&INPUT, values);
         let _ = block_on(ctx.execute(Sum));
-        let trace = block_on(ctx.trace());
+        let trace = block_on(reader.get_trace());
 
         assert_eq!(len + 2, trace.len());
         assert_eq!(trace[0], "[Length]");
@@ -88,14 +89,15 @@ proptest! {
         let sum: u64 = values.iter().sum();
         let len = values.len();
 
-        let ctx = Arc::new(Reactor::new());
+        let (tracer, reader) = trace::body_execution();
+        let ctx = Arc::new(Reactor::with_trace(tracer));
         ctx.set_param(&INPUT, values);
         let result_sum = block_on(ctx.execute(Sum));
         let result_len = block_on(ctx.execute(Length));
         prop_assert_eq!(sum, *result_sum.unwrap());
         prop_assert_eq!(len, *result_len.unwrap());
 
-        let len_num = block_on(ctx.trace()).iter().filter(|s| s == &"[Length]").count();
+        let len_num = block_on(reader.get_trace()).iter().filter(|s| s == &"[Length]").count();
         prop_assert_eq!(1, len_num);
     }
 
@@ -105,8 +107,8 @@ proptest! {
     ) {
         let sum: u64 = values.iter().sum::<u64>() * 2;
 
-        // sleep(Duration::from_millis(50));
-        let ctx = Arc::new(Reactor::new());
+        let (tracer, reader) = trace::body_execution();
+        let ctx = Arc::new(Reactor::with_trace(tracer));
         ctx.set_param(&INPUT, values.clone());
         let result_sum = block_on(ctx.execute(Double));
         prop_assert_eq!(sum, *result_sum.unwrap());
@@ -118,7 +120,7 @@ proptest! {
         let res = *result_sum.unwrap();
         assert_eq!(sum, res);
 
-        let doubling_num = block_on(ctx.trace()).iter().filter(|s| s == &"[Double]").count();
+        let doubling_num = block_on(reader.get_trace()).iter().filter(|s| s == &"[Double]").count();
         assert_eq!(1, doubling_num);
     }
 
@@ -128,7 +130,8 @@ proptest! {
     ) {
         let res = values.iter().sum::<u64>() * 2;
 
-        let ctx = Arc::new(Reactor::new());
+        let (tracer, reader) = trace::body_execution();
+        let ctx = Arc::new(Reactor::with_trace(tracer));
         ctx.set_param(&INPUT, values.clone());
         let result_sum = block_on(ctx.execute(Double));
         prop_assert_eq!(res, *result_sum.unwrap());
@@ -138,7 +141,7 @@ proptest! {
         let result_sum = block_on(ctx.execute(Double));
         prop_assert_eq!(res + 2, *result_sum.unwrap());
 
-        let doubling_num = block_on(ctx.trace()).iter().filter(|s| s == &"[Double]").count();
+        let doubling_num = block_on(reader.get_trace()).iter().filter(|s| s == &"[Double]").count();
         prop_assert_eq!(2, doubling_num);
     }
 

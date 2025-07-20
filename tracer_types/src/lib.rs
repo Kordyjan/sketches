@@ -4,12 +4,33 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum Message {
-    NewChapter { data: String, fingerprint: String },
-    Comment { content: String },
-    Push { key: String, entry: CacheEntry },
-    Pull { key: String },
-    Remove { key: String },
-    Modify { key: String, entry: CacheEntry },
+    NewChapter {
+        data: String,
+        fingerprint: String,
+    },
+    Push {
+        key: String,
+        entry: CacheEntry,
+        stack: Vec<String>,
+    },
+    Pull {
+        key: String,
+        reason: String,
+        stack: Vec<String>,
+    },
+    Remove {
+        key: String,
+        stack: Vec<String>,
+    },
+    Modify {
+        key: String,
+        entry: CacheEntry,
+        stack: Vec<String>,
+    },
+    BodyExecuted {
+        key: String,
+        stack: Vec<String>,
+    },
     End {},
 }
 

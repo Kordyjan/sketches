@@ -62,7 +62,7 @@ impl ChaptersState {
                     // End of trace
                     break;
                 }
-                Message::Push { key, entry } | Message::Modify { key, entry } => {
+                Message::Push { key, entry, .. } | Message::Modify { key, entry, .. } => {
                     cache = CacheState(
                         cache
                             .0
@@ -70,7 +70,7 @@ impl ChaptersState {
                     );
                     current_chapter_messages.push((message, cache.clone()));
                 }
-                Message::Remove { key } => {
+                Message::Remove { key, .. } => {
                     cache = CacheState(cache.0.remove(key));
                     current_chapter_messages.push((message, cache.clone()));
                 }
@@ -185,12 +185,12 @@ impl ChaptersState {
             .iter()
             .map(|(message, _)| match message {
                 Message::NewChapter { .. } => ("NewChapter".to_string(), true),
-                Message::Pull { key } => (format!("Pull {key}"), false),
+                Message::Pull { key, reason, .. } => (format!("Pull({reason}) {key}"), false),
                 Message::Push { key, .. } => (format!("Push {key}"), false),
                 Message::Modify { key, .. } => (format!("Modify {key}"), false),
-                Message::Remove { key } => (format!("Remove {key}"), false),
-                Message::Comment { content } => (content.clone(), true),
+                Message::Remove { key, .. } => (format!("Remove {key}"), false),
                 Message::End {} => ("End".to_string(), true),
+                Message::BodyExecuted { key, .. } => (format!("Executed {key}"), true),
             })
             .enumerate()
             .map(|(id, (desc, is_comment))| OpHead {
@@ -236,6 +236,26 @@ impl ChaptersState {
         keyed_entries.sort_by(|a, b| a.key.cmp(&b.key));
 
         Some(Snapshot(keyed_entries))
+    }
+
+    pub(crate) fn get_stack(&self, chapter: usize, op: usize) -> Vec<String> {
+        if chapter >= self.chapters.len() {
+            return Vec::new();
+        }
+
+        if op >= self.chapters[chapter].len() {
+            return Vec::new();
+        }
+
+        let (msg, _) = &self.chapters[chapter][op];
+        match msg {
+            Message::NewChapter { .. } | Message::End { .. } => Vec::new(),
+            Message::BodyExecuted { stack, .. }
+            | Message::Pull { stack, .. }
+            | Message::Push { stack, .. }
+            | Message::Modify { stack, .. }
+            | Message::Remove { stack, .. } => stack.clone(),
+        }
     }
 }
 
