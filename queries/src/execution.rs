@@ -24,17 +24,13 @@ use std::{
 pub type CacheMap = PerMap<QueryId, Fingerprint>;
 
 pub struct Cached {
-    pub result: anyhow::Result<(Fingerprint, Arc<dyn Object>)>,
+    pub result: Result<(Fingerprint, Arc<dyn Object>)>,
     pub world_state: CacheMap,
     pub deps_state: CacheMap,
     pub direct_world_state: CacheMap,
 }
 
-struct ValueWithWorld<T>(
-    Fingerprint,
-    T,
-    CacheMap
-);
+struct ValueWithWorld<T>(Fingerprint, T, CacheMap);
 
 pub struct Reactor {
     params: QDashMap<(Fingerprint, Arc<dyn Object>)>,
@@ -358,7 +354,8 @@ impl Executor for Arc<Reactor> {
         async move {
             loop {
                 let continuity = self.new_continuity();
-                let ValueWithWorld(_, res, world) = Arc::clone(&continuity).drive(query.clone()).await?;
+                let ValueWithWorld(_, res, world) =
+                    Arc::clone(&continuity).drive(query.clone()).await?;
                 if self.verify(&world) {
                     break Ok(res);
                 }
@@ -390,9 +387,7 @@ where
     Q::Response: QueryResponse,
     Q: Query,
 {
-    type Output = Result<ValueWithWorld<
-        <<Q as Query>::Response as QueryResponse>::Boxed,
-    >>;
+    type Output = Result<ValueWithWorld<<<Q as Query>::Response as QueryResponse>::Boxed>>;
 
     fn poll(mut self: Pin<&mut Self>, cx: &mut WakeContext<'_>) -> Poll<Self::Output> {
         if let Some(query) = self.as_mut().query.take() {
@@ -418,7 +413,9 @@ where
                         .with_context(|| {
                             format!("Conflicting past_queries with id: {}", self.query_id)
                         })
-                        .map(|response| ValueWithWorld(*fingerprint, response, cached.world_state.clone()))
+                        .map(|response| {
+                            ValueWithWorld(*fingerprint, response, cached.world_state.clone())
+                        })
                 });
             Poll::Ready(res)
         } else {
@@ -442,14 +439,15 @@ impl Continuity {
         }
     }
 
-    pub fn drive<Q, T>(self: Arc<Self>, query: Q) -> impl Future<Output = Result<ValueWithWorld<T::Boxed>>>
+    pub fn drive<Q, T>(
+        self: Arc<Self>,
+        query: Q,
+    ) -> impl Future<Output = Result<ValueWithWorld<T::Boxed>>>
     where
         Q: Query<Response = T>,
         T: QueryResponse,
     {
-        async move {
-            self.do_execute(query, None).await
-        }
+        async move { self.do_execute(query, None).await }
     }
 
     async fn do_execute<Q, T>(
@@ -462,30 +460,41 @@ impl Continuity {
         T: QueryResponse,
     {
         let id = query.id().clone();
-        let result= if self.fresh_queries.contains(&query.id()) {
-            let cached = &self
-                .reactor
-                .cache_pull(
-                    &query.id(),
-                    "Query was fresh",
-                    parent_view.into().map(ExecutionContext).as_ref(),
-                )
-                .context("Cache was corrupted")?;
-            let Ok((fingerprint, value)) = cached.result.as_ref() else {
-                bail!("Query {id} in cache was overriden with failed execution.")
-            };
+        let context = parent_view.into().map(ExecutionContext);
 
-            let value = T::downcast(value.clone())
-                .with_context(|| format!("Conflicting past_queries with id: {}", query.id()))?;
+        let result: Option<ValueWithWorld<T::Boxed>> = if self.fresh_queries.contains(&query.id()) {
+            if let Some(cached) =
+                &self
+                    .reactor
+                    .cache_pull(&query.id(), "Query was fresh", context.as_ref())
+            {
+                let Ok((fingerprint, value)) = cached.result.as_ref() else {
+                    bail!("Query {id} in cache was overridden with failed execution.")
+                };
 
-            ValueWithWorld(*fingerprint, value, cached.world_state.clone())
+                let value = T::downcast(value.clone())
+                    .with_context(|| format!("Conflicting past_queries with id: {}", query.id()))?;
+
+                Some(ValueWithWorld(
+                    *fingerprint,
+                    value,
+                    cached.world_state.clone(),
+                ))
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
+        let result = if let Some(r) = result {
+            r
         } else {
             self.reactor
-                .do_execute(query, parent_view.into().map(ExecutionContext))
+                .do_execute(query, context)
                 .await
-                .with_context(|| format!("as a part of {id}"))?
+                .map_err(|e| anyhow!("{} as a part of {id}", e))?
         };
-        self.fresh_queries.insert(id);
         Ok(result)
     }
 }
@@ -575,11 +584,15 @@ impl ExecutionContext {
                 .clone()
                 .do_execute(query, Arc::clone(&self.0))
                 .await
-                .with_context(|| format!("as a part of {id}"))?;
+                .map_err(|e| anyhow!("{} as a part of {id}", e))?;
             self.0
                 .direct_dependencies
-                .unbounded_send(PerMap::empty().insert(id.clone(), fingerprint))?;
-            self.0.world_dependencies.unbounded_send(world)?;
+                .unbounded_send(PerMap::empty().insert(id.clone(), fingerprint))
+                .map_err(|e| anyhow!("Receiver (direct) discarded: {e}"))?;
+            self.0
+                .world_dependencies
+                .unbounded_send(world)
+                .map_err(|e| anyhow!("Receiver (world) discarded: {e}"))?;
             Ok(result)
         }
     }
