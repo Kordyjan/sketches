@@ -4,7 +4,6 @@ use async_std::sync::RwLock;
 use divisors_fixed::Divisors;
 use futures::future::TryJoinAll;
 use itertools::Itertools;
-use queries::fingerprinting::stamp_with_fingerprint;
 use queries::{execution::Reactor, Executor};
 use rand::{distr, Rng};
 use rustc_hash::FxHashMap;
@@ -74,11 +73,12 @@ async fn mutable_scenario(
 
     let steps = calc_steps(&groups);
 
-    let (output, tracer, chapter_marker) = tracer::create_full("../tmp/trace.json").unwrap();
+    // let (output, tracer, chapter_marker) = tracer::create_full("../tmp/trace.json").unwrap();
 
     let lock = Arc::new(RwLock::new(()));
-    spawn(output.run()).detach();
-    let reactor = Arc::new(Reactor::with_trace(tracer));
+    // spawn(output.run()).detach();
+    // let reactor = Arc::new(Reactor::with_trace(tracer));
+    let reactor = Arc::new(Reactor::new());
     reactor.set_param(&INPUT, input.clone());
 
     for Step {
@@ -112,8 +112,8 @@ async fn mutable_scenario(
         for (n, v) in updates {
             input[n] = v;
         }
-        let (fingerprint, _) = stamp_with_fingerprint(Arc::new(input.clone()));
-        chapter_marker.new_chapter(format!("|{}|", input.join("")), format!("{fingerprint:?}"));
+        // let (fingerprint, _) = stamp_with_fingerprint(Arc::new(input.clone()));
+        // chapter_marker.new_chapter(format!("|{}|", input.join("")), format!("{fingerprint:?}"));
         reactor.set_param(&INPUT, input.clone());
 
         let mut cache = FxHashMap::default();
